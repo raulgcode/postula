@@ -14,7 +14,7 @@ import { createInterface } from "node:readline/promises";
 import { parseArgs, parseEnv } from "node:util";
 import { planSecrets } from "./secrets";
 
-const APPS = ["starter-api", "starter-web"];
+const APPS = ["postula-api", "postula-web"];
 
 function fail(message: string): never {
   console.error(`✗ ${message}`);

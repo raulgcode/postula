@@ -1,7 +1,7 @@
 import { parseWithZod } from "@conform-to/zod/v4";
-import { APIError } from "@starter/auth";
-import { magicLinkSchema, passwordSignInSchema } from "@starter/contracts";
-import type { AuthMethod } from "@starter/env";
+import { APIError } from "@postula/auth";
+import { magicLinkSchema, passwordSignInSchema } from "@postula/contracts";
+import type { AuthMethod } from "@postula/env";
 import { data, href, type RouterContextProvider, redirect } from "react-router";
 import { localeOf } from "~/lib/locale.server";
 import { requestAddress, withinRateLimits } from "~/lib/rate-limit.server";
@@ -121,7 +121,7 @@ export async function signInAction({ request, url, context }: ActionArgs) {
     );
   }
   await auth.api.signInMagicLink({
-    // The email goes out in the page's language (`sendMagicLink` in @starter/auth).
+    // The email goes out in the page's language (`sendMagicLink` in @postula/auth).
     body: {
       email: submission.value.email,
       callbackURL: redirectTo,

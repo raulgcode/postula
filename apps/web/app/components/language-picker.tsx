@@ -1,4 +1,4 @@
-import { type Locale, localeNames, locales } from "@starter/i18n";
+import { type Locale, localeNames, locales } from "@postula/i18n";
 import { useState } from "react";
 import { href, useFetcher, useLocation } from "react-router";
 import { useLocale, useT } from "~/lib/i18n";

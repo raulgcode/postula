@@ -1,7 +1,7 @@
 import { getFormProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { APIError } from "@starter/auth";
-import { signUpSchema } from "@starter/contracts";
+import { APIError } from "@postula/auth";
+import { signUpSchema } from "@postula/contracts";
 import { data, Form, href, Link, redirect, useNavigation } from "react-router";
 import { GoogleButton, OrWithEmail } from "~/components/sign-in/google-button";
 import { StandalonePage } from "~/components/standalone-page";

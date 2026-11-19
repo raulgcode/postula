@@ -1,7 +1,7 @@
 // For browser tests only: the root loader data a page gets in each language. Never imported by the
 // app itself, so the dictionaries stay out of the bundle.
-import type { Locale } from "@starter/i18n";
-import { dictionaries, type Namespace } from "@starter/i18n/messages";
+import type { Locale } from "@postula/i18n";
+import { dictionaries, type Namespace } from "@postula/i18n/messages";
 import type { ReactNode } from "react";
 import { createRoutesStub } from "react-router";
 import { render } from "vitest-browser-react";

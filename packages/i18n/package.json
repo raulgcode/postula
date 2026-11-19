@@ -1,5 +1,5 @@
 {
-  "name": "@starter/i18n",
+  "name": "@postula/i18n",
   "private": true,
   "type": "module",
   "exports": {
@@ -10,6 +10,6 @@
     "typecheck": "tsc"
   },
   "devDependencies": {
-    "@starter/tsconfig": "workspace:*"
+    "@postula/tsconfig": "workspace:*"
   }
 }

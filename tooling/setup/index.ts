@@ -14,7 +14,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { createInterface } from "node:readline/promises";
 import { parseArgs } from "node:util";
-import { type AuthMethod, authMethods, authMethodsSchema } from "@starter/env";
+import { type AuthMethod, authMethods, authMethodsSchema } from "@postula/env";
 import { chromium } from "playwright";
 import { authMethodLabels, parseAuthChoice } from "./auth-choice";
 import { buildEnvFile, parseEnvKeys, type SecretGenerators, setEnvValue } from "./env-file";

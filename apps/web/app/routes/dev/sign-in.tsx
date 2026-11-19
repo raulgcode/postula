@@ -1,4 +1,4 @@
-import { asc, eq, inArray, schema, sql } from "@starter/db";
+import { asc, schema, sql } from "@postula/db";
 import { data, Form, href, redirect } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -16,7 +16,7 @@ export function meta(_: Route.MetaArgs) {
 
 const like = (q: string) => `%${q.replace(/[\\%_]/g, "\\$&")}%`;
 
-/** Every user (filtered by `?q=`) with their workspaces, to enter as any of them without an email. */
+/** Every user (filtered by `?q=`), to enter as any of them without an email. */
 export async function loader({ request, url }: Route.LoaderArgs) {
   requireDevTools(request);
   const q = url.searchParams.get("q")?.trim() ?? "";
@@ -31,25 +31,10 @@ export async function loader({ request, url }: Route.LoaderArgs) {
     )
     .orderBy(asc(schema.user.createdAt))
     .limit(50);
-  const memberships = users.length
-    ? await db
-        .select({ userId: schema.member.userId, name: schema.organization.name })
-        .from(schema.member)
-        .innerJoin(schema.organization, eq(schema.organization.id, schema.member.organizationId))
-        .where(
-          inArray(
-            schema.member.userId,
-            users.map((user) => user.id),
-          ),
-        )
-    : [];
   return {
     q,
     current: session?.user.email ?? null,
-    users: users.map((user) => ({
-      ...user,
-      workspaces: memberships.filter((m) => m.userId === user.id).map((m) => m.name),
-    })),
+    users,
   };
 }
 
@@ -97,11 +82,6 @@ export default function DevSignIn({ loaderData }: Route.ComponentProps) {
                   <div className="min-w-0">
                     <p className="truncate font-medium">{user.name || user.email}</p>
                     <p className="truncate text-sm text-muted-foreground">{user.email}</p>
-                    {user.workspaces.length > 0 ? (
-                      <p className="truncate text-sm text-muted-foreground">
-                        {user.workspaces.join(" · ")}
-                      </p>
-                    ) : null}
                   </div>
                   <Form method="post">
                     <input type="hidden" name="userId" value={user.id} />

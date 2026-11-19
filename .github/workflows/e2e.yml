@@ -37,12 +37,12 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_USER: starter
-          POSTGRES_PASSWORD: starter
-          POSTGRES_DB: starter_test
+          POSTGRES_USER: postula
+          POSTGRES_PASSWORD: postula
+          POSTGRES_DB: postula_test
         ports: ["5432:5432"]
         options: >-
-          --health-cmd "pg_isready -U starter -d starter_test"
+          --health-cmd "pg_isready -U postula -d postula_test"
           --health-interval 2s --health-timeout 5s --health-retries 20
       mailpit:
         image: axllent/mailpit:latest

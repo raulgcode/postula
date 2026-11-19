@@ -15,7 +15,7 @@ export default defineConfig({
         },
       },
       {
-        // Services against real Postgres (starter_test) and Mailpit from compose.yaml.
+        // Services against real Postgres (postula_test) and Mailpit from compose.yaml.
         test: {
           name: "integration",
           environment: "node",

@@ -11,19 +11,21 @@ export default [
   route("theme", "routes/theme.ts"),
   route("locale", "routes/locale.ts"),
   route("api/auth/*", "routes/api.auth.ts"),
+  // Connecting an AI (Claude, ChatGPT…) to the MCP server: OAuth discovery and the consent page.
+  route(".well-known/oauth-authorization-server", "routes/oauth/authorization-server.ts", {
+    id: "oauth-authorization-server",
+  }),
+  route(".well-known/oauth-authorization-server/api/auth", "routes/oauth/authorization-server.ts"),
+  route("oauth/consent", "routes/oauth/consent.tsx"),
   // Local tools (sign in as any user). Never in a production build: see lib/dev-tools.server.ts.
   ...(process.env.NODE_ENV === "production"
     ? []
     : [route("dev/sign-in", "routes/dev/sign-in.tsx")]),
   ...prefix("app", [
+    // Everything under /app has a signed-in person, who is their own tenant.
     layout("routes/app/layout.tsx", [
-      index("routes/app/open-workspace.ts"),
-      route("onboarding", "routes/app/onboarding.tsx"),
-      // Workspace slugs always end in a random suffix, so they never match the paths above.
-      route(":workspace", "routes/app/workspace-layout.tsx", [
-        index("routes/app/home.tsx"),
-        route("settings", "routes/app/settings.tsx"),
-      ]),
+      index("routes/app/home.tsx"),
+      route("settings", "routes/app/settings.tsx"),
     ]),
   ]),
 ] satisfies RouteConfig;

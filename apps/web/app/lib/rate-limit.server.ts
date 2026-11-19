@@ -1,4 +1,4 @@
-import { clientAddress, hitRateLimit, type RateLimitRule } from "@starter/core";
+import { clientAddress, hitRateLimit, type RateLimitRule } from "@postula/core";
 import { db, env } from "./services.server";
 
 const MINUTE = 60_000;

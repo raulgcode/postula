@@ -1,5 +1,5 @@
 {
-  "name": "starter",
+  "name": "postula",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.28.0",
@@ -7,7 +7,6 @@
     "node": ">=22.22.0"
   },
   "scripts": {
-    "start": "tsx tooling/start/index.ts",
     "setup": "tsx tooling/setup/index.ts",
     "dev": "turbo run dev",
     "build": "turbo run build",
@@ -16,21 +15,21 @@
     "format": "biome check --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "pnpm --filter @starter/e2e test",
+    "test:e2e": "pnpm --filter @postula/e2e test",
     "e2e:remote": "tsx tooling/e2e-remote/index.ts",
     "release": "tsx tooling/release/index.ts",
     "fly:secrets": "tsx tooling/fly-secrets/index.ts",
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
-    "db:generate": "pnpm --filter @starter/db generate",
-    "db:migrate": "pnpm --filter @starter/db migrate",
-    "db:studio": "pnpm --filter @starter/db studio",
-    "auth:generate": "pnpm --filter @starter/auth auth:generate"
+    "db:generate": "pnpm --filter @postula/db generate",
+    "db:migrate": "pnpm --filter @postula/db migrate",
+    "db:studio": "pnpm --filter @postula/db studio",
+    "auth:generate": "pnpm --filter @postula/auth auth:generate"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
-    "@starter/db": "workspace:*",
-    "@starter/env": "workspace:*",
+    "@postula/db": "workspace:*",
+    "@postula/env": "workspace:*",
     "@types/node": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",

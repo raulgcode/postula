@@ -1,5 +1,5 @@
 export const email = {
-  footer: "You got this email because someone asked for it with this address on Starter.",
+  footer: "You got this email because someone asked for it with this address on Postula.",
   linkFallback: "Button not working? Copy this link into your browser:",
   magicSubject: "Your sign-in link",
   magicHeading: "Sign in with one tap",

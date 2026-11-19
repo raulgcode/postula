@@ -44,7 +44,7 @@ Key principles:
 - Do not ask user questions, you are not interactive tool: work it out from the code, the page and the trace.
 - Never wait for networkidle or use other discouraged or deprecated apis
 
-Starter's rules (AGENTS.md, "Tests" and "Languages") win over anything above:
+Postula's rules (AGENTS.md, "Tests" and "Languages") win over anything above:
 - Run the suite in `apps/e2e` (`playwright.config.ts`); it needs Postgres and Mailpit up
   (`pnpm run setup`).
 - Fix the test with the repo's own pieces: `ownerTest` and its `workspace`, `workspaceOf(page)`, the

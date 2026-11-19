@@ -11,7 +11,7 @@ import * as z from "zod";
  */
 export function devSignIn(enabled: boolean) {
   return {
-    id: "starter-dev-sign-in",
+    id: "postula-dev-sign-in",
     endpoints: {
       devSignIn: createAuthEndpoint.serverOnly(
         { method: "POST", body: z.object({ userId: z.string() }) },

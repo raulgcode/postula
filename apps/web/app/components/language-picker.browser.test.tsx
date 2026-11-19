@@ -1,4 +1,4 @@
-import type { Locale } from "@starter/i18n";
+import type { Locale } from "@postula/i18n";
 import { createRoutesStub } from "react-router";
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";
@@ -14,7 +14,7 @@ function renderPicker(locale: Locale) {
       loader: () => translatedRoot(locale),
       HydrateFallback: () => null,
       children: [
-        { path: "app/:workspace/settings", Component: () => <LanguagePicker /> },
+        { path: "app/settings", Component: () => <LanguagePicker /> },
         {
           path: "locale",
           action: async ({ request }) => {
@@ -25,7 +25,7 @@ function renderPicker(locale: Locale) {
       ],
     },
   ]);
-  const screen = render(<Stub initialEntries={["/app/acme-x1/settings?tab=1"]} />);
+  const screen = render(<Stub initialEntries={["/app/settings?tab=1"]} />);
   return { screen, saved: () => saved };
 }
 
@@ -55,6 +55,6 @@ describe("LanguagePicker", () => {
     await (await screen).getByRole("radio", { name: "Español" }).click();
 
     await expect.poll(() => saved()?.get("locale")).toBe("es");
-    expect(saved()?.get("redirectTo")).toBe("/app/acme-x1/settings?tab=1");
+    expect(saved()?.get("redirectTo")).toBe("/app/settings?tab=1");
   });
 });

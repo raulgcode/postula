@@ -1,5 +1,5 @@
 export const common = {
-  appName: "Starter",
+  appName: "Postula",
   skipToContent: "Skip to content",
   loading: "Loading…",
   signOut: "Sign out",

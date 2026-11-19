@@ -1,5 +1,5 @@
 {
-  "name": "@starter/contracts",
+  "name": "@postula/contracts",
   "private": true,
   "type": "module",
   "exports": {
@@ -9,10 +9,10 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@starter/i18n": "workspace:*",
+    "@postula/i18n": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@starter/tsconfig": "workspace:*"
+    "@postula/tsconfig": "workspace:*"
   }
 }

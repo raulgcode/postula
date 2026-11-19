@@ -3,7 +3,7 @@ import type { en } from "../en";
 
 /** What every page uses: the header, the menus, the error page. The root route loads it. */
 export const common = {
-  appName: "Starter",
+  appName: "Postula",
   skipToContent: "Saltar al contenido",
   loading: "Cargando…",
   signOut: "Cerrar sesión",

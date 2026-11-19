@@ -1,5 +1,5 @@
 {
-  "extends": "@starter/tsconfig/base.json",
+  "extends": "@postula/tsconfig/base.json",
   "compilerOptions": {
     "lib": ["DOM", "ES2023"]
   },

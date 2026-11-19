@@ -1,8 +1,10 @@
-import { createAuth, type RateLimitStorage } from "@starter/auth";
-import { hitRateLimit } from "@starter/core";
-import { createDatabase } from "@starter/db";
-import { createMailer } from "@starter/email";
-import { deriveSecret, getServerEnv, googleCredentials } from "@starter/env";
+import { createAuth, type RateLimitStorage } from "@postula/auth";
+import { mcpUrl } from "@postula/contracts";
+import { type CoreServices, hashOAuthToken, hitRateLimit } from "@postula/core";
+import { createDatabase } from "@postula/db";
+import { createMailer } from "@postula/email";
+import { deriveSecret, getServerEnv, googleCredentials } from "@postula/env";
+import { workerMachinesFromEnv } from "@postula/fly";
 
 // Server-only singletons. Cached on globalThis so dev HMR doesn't open a new pool per reload.
 function singleton<T>(name: string, create: () => T): T {
@@ -19,9 +21,9 @@ export const secrets = {
   cookies: deriveSecret(env.BETTER_AUTH_SECRET, "cookies"),
 };
 
-export const database = singleton("__starterDatabase", () => createDatabase(env.DATABASE_URL));
+export const database = singleton("__postulaDatabase", () => createDatabase(env.DATABASE_URL));
 export const db = database.db;
-export const mailer = singleton("__starterMailer", () => createMailer(env));
+export const mailer = singleton("__postulaMailer", () => createMailer(env));
 
 /** Better Auth's rate limit, in Postgres so it holds across every machine. */
 const authRateLimitStorage: RateLimitStorage = {
@@ -34,7 +36,7 @@ const authRateLimitStorage: RateLimitStorage = {
   },
 };
 
-export const auth = singleton("__starterAuth", () =>
+export const auth = singleton("__postulaAuth", () =>
   createAuth({
     db,
     mailer,
@@ -47,8 +49,12 @@ export const auth = singleton("__starterAuth", () =>
     clientIpHeader: env.CLIENT_IP_HEADER,
     // /dev/sign-in signs in as any user; false in every build, so production can't.
     devSignIn: import.meta.env.DEV,
+    aiConnections: { resource: mcpUrl(env.API_URL), hashToken: hashOAuthToken },
   }),
 );
 
 /** How people sign in here (AUTH_METHODS), for /login and the pages that depend on it. */
 export const authMethods = env.AUTH_METHODS;
+
+/** What core's operations reach besides the database: the worker's machines for the switch. */
+export const coreServices: CoreServices = { machines: workerMachinesFromEnv(env) };

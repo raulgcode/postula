@@ -1,79 +1,24 @@
-import { and, asc, type Database, desc, eq, isNotNull, schema, sql } from "@starter/db";
+import { oauthProvider } from "@better-auth/oauth-provider";
+import { aiConnectionScopes, aiTokenPrefixes } from "@postula/contracts";
+import { type Database, schema } from "@postula/db";
 import {
   AccountEmail,
   accountEmailSubject,
   MagicLinkEmail,
   type Mailer,
   magicLinkSubject,
-} from "@starter/email";
-import type { AuthMethod } from "@starter/env";
-import { defaultLocale, parseLocale } from "@starter/i18n";
+} from "@postula/email";
+import type { AuthMethod } from "@postula/env";
+import { defaultLocale, parseLocale } from "@postula/i18n";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { magicLink, organization } from "better-auth/plugins";
+import { magicLink } from "better-auth/plugins";
 import { createElement } from "react";
 import { devSignIn } from "./dev-sign-in";
-
-/**
- * The workspace a new session opens with: the one the user had open in their latest session,
- * if they are still a member, otherwise the first workspace they joined.
- */
-export async function defaultOrganizationId(db: Database, userId: string) {
-  const [lastUsed] = await db
-    .select({ organizationId: schema.member.organizationId })
-    .from(schema.session)
-    .innerJoin(
-      schema.member,
-      and(
-        eq(schema.member.userId, schema.session.userId),
-        // session.active_organization_id is text (Better Auth's schema); organization ids are uuid.
-        eq(sql`${schema.member.organizationId}::text`, schema.session.activeOrganizationId),
-      ),
-    )
-    .where(and(eq(schema.session.userId, userId), isNotNull(schema.session.activeOrganizationId)))
-    .orderBy(desc(schema.session.createdAt))
-    .limit(1);
-  if (lastUsed) return lastUsed.organizationId;
-
-  const [membership] = await db
-    .select({ organizationId: schema.member.organizationId })
-    .from(schema.member)
-    .where(eq(schema.member.userId, userId))
-    .orderBy(asc(schema.member.createdAt))
-    .limit(1);
-  return membership?.organizationId;
-}
 
 export type RateLimitStorage = NonNullable<
   NonNullable<BetterAuthOptions["rateLimit"]>["customStorage"]
 >;
-
-/**
- * Members and invitations go through @starter/core (with its own checks), so Better Auth's own
- * endpoints for them are off over HTTP: without this, any member could invite, promote or remove
- * people by calling them directly. The server keeps using `auth.api` after its own checks.
- */
-export const disabledOrganizationPaths = [
-  "/organization/invite-member",
-  "/organization/accept-invitation",
-  "/organization/reject-invitation",
-  "/organization/cancel-invitation",
-  "/organization/get-invitation",
-  "/organization/list-invitations",
-  "/organization/list-user-invitations",
-  "/organization/add-member",
-  "/organization/remove-member",
-  "/organization/update-member-role",
-  "/organization/leave",
-  "/organization/update",
-  "/organization/delete",
-  "/organization/list-members",
-  "/organization/get-full-organization",
-  // Workspaces are created by the onboarding (`auth.api` on the server), which picks the slug
-  // with its random suffix; over HTTP anyone could take "settings" or a brand's name.
-  "/organization/create",
-  "/organization/check-slug",
-];
 
 export interface CreateAuthOptions {
   db: Database;
@@ -88,7 +33,7 @@ export interface CreateAuthOptions {
   /** Better Auth's per-IP rate limit. Defaults to on; the e2e server disables it. */
   rateLimit?: boolean;
   /**
-   * Where the rate limit counts, shared by every server (`hitRateLimit` of @starter/core);
+   * Where the rate limit counts, shared by every server (`hitRateLimit` of @postula/core);
    * in memory without it, which only holds on a single machine.
    */
   rateLimitStorage?: RateLimitStorage;
@@ -96,7 +41,44 @@ export interface CreateAuthOptions {
   clientIpHeader?: string;
   /** Local development only: enables `auth.api.devSignIn` (see dev-sign-in.ts). */
   devSignIn?: boolean;
+  /** The AIs (Claude, ChatGPT…) that connect to the MCP server with OAuth. */
+  aiConnections: AiConnectionsOptions;
 }
+
+export interface AiConnectionsOptions {
+  /** The MCP server the tokens are for: `${API_URL}/mcp`. */
+  resource: string;
+  /**
+   * How a token is kept in the database. The API checks tokens straight in Postgres with the
+   * same function (`hashOAuthToken` of @postula/core), so a copy of the database can't use them.
+   */
+  hashToken: (token: string) => string;
+}
+
+/** Where Better Auth sends the person to allow an AI. */
+export const AI_CONSENT_PAGE = "/oauth/consent";
+
+/**
+ * OAuth endpoints we don't use over HTTP: AIs register themselves (/oauth2/register) and the
+ * person allows them on the consent page, which calls `auth.api` on the server.
+ */
+export const disabledOAuthPaths = [
+  "/oauth2/create-client",
+  "/oauth2/get-client",
+  "/oauth2/get-clients",
+  "/oauth2/update-client",
+  "/oauth2/delete-client",
+  "/oauth2/client/rotate-secret",
+  "/oauth2/get-consent",
+  "/oauth2/get-consents",
+  "/oauth2/update-consent",
+  "/oauth2/delete-consent",
+  "/admin/oauth2/create-client",
+  "/admin/oauth2/update-client",
+  "/admin/oauth2/resources",
+  "/admin/oauth2/resources/:identifier",
+  "/admin/oauth2/resources/:identifier/clients/:client_id",
+];
 
 export function createAuth({
   db,
@@ -110,6 +92,7 @@ export function createAuth({
   rateLimitStorage,
   clientIpHeader,
   devSignIn: devSignInEnabled = false,
+  aiConnections,
 }: CreateAuthOptions) {
   const password = methods.includes("password");
   if (methods.includes("google") && !google) {
@@ -130,12 +113,12 @@ export function createAuth({
   };
 
   return betterAuth({
-    appName: "Starter",
+    appName: "Postula",
     baseURL,
     secret,
     trustedOrigins: [baseURL, ...trustedOrigins],
+    disabledPaths: disabledOAuthPaths,
     rateLimit: { enabled: rateLimit, customStorage: rateLimitStorage },
-    disabledPaths: disabledOrganizationPaths,
     database: drizzleAdapter(db, { provider: "pg", schema }),
     user: {
       additionalFields: {
@@ -171,19 +154,6 @@ export function createAuth({
           },
         }
       : undefined,
-    databaseHooks: {
-      session: {
-        create: {
-          // A new sign-in reopens the workspace used last; without it they'd land in onboarding.
-          async before(session) {
-            if (session.activeOrganizationId) return;
-            const activeOrganizationId = await defaultOrganizationId(db, session.userId);
-            if (!activeOrganizationId) return;
-            return { data: { ...session, activeOrganizationId } };
-          },
-        },
-      },
-    },
     advanced: {
       database: { generateId: "uuid" },
       ipAddress: clientIpHeader ? { ipAddressHeaders: [clientIpHeader] } : undefined,
@@ -205,8 +175,26 @@ export function createAuth({
           });
         },
       }),
-      organization({ creatorRole: "owner" }),
       devSignIn(devSignInEnabled),
+      oauthProvider({
+        loginPage: "/login",
+        consentPage: AI_CONSENT_PAGE,
+        scopes: [...aiConnectionScopes],
+        // Opaque tokens, checked by the API in Postgres: no signing keys to share or rotate.
+        disableJwtPlugin: true,
+        storeTokens: { hash: (token) => aiConnections.hashToken(token) },
+        prefix: { ...aiTokenPrefixes },
+        // Claude, ChatGPT and the editors register themselves the first time (RFC 7591), with
+        // no account of theirs here: what protects the person is the sign-in and the consent.
+        allowDynamicClientRegistration: true,
+        allowUnauthenticatedClientRegistration: true,
+        // Editors (Cursor, VS Code) listen on http://127.0.0.1 and often leave the type out.
+        clientRegistrationDefaultApplicationType: "infer",
+        resources: [{ identifier: aiConnections.resource, name: "Postula MCP" }],
+        clientRegistrationDefaultResources: [aiConnections.resource],
+        // Reconnect after 90 days without using it, not every month.
+        refreshTokenExpiresIn: 90 * 24 * 60 * 60,
+      }),
     ],
   });
 }

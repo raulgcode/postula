@@ -1,5 +1,5 @@
-import type { MessageKey } from "@starter/i18n";
-import type { Messages } from "@starter/i18n/messages";
+import type { MessageKey } from "@postula/i18n";
+import type { Messages } from "@postula/i18n/messages";
 import { createRoutesStub, Link } from "react-router";
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";

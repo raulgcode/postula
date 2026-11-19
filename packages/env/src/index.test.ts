@@ -15,7 +15,7 @@ const base = {
   DATABASE_URL: "postgres://u:p@localhost:5432/db",
   SMTP_HOST: "localhost",
   SMTP_PORT: "1025",
-  EMAIL_FROM: "Starter <hello@starter.example>",
+  EMAIL_FROM: "Postula <hello@postula.intensoft.dev>",
 };
 
 describe("parseEnv", () => {
@@ -69,7 +69,7 @@ describe("parseEnv", () => {
     const local = { ...base, BETTER_AUTH_SECRET: EXAMPLE_AUTH_SECRET };
     expect(parseEnv(serverEnvSchema, local).BETTER_AUTH_SECRET).toBe(EXAMPLE_AUTH_SECRET);
     expect(() =>
-      parseEnv(serverEnvSchema, { ...local, APP_URL: "https://app.starter.example" }),
+      parseEnv(serverEnvSchema, { ...local, APP_URL: "https://app.postula.intensoft.dev" }),
     ).toThrow(/BETTER_AUTH_SECRET/);
   });
 

@@ -1,4 +1,4 @@
-import { type AuthMethod, authMethods } from "@starter/env";
+import { type AuthMethod, authMethods } from "@postula/env";
 
 /** How each way to sign in reads in the setup's question, in the order the login shows them. */
 export const authMethodLabels: Record<AuthMethod, string> = {

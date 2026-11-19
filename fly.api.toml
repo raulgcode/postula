@@ -1,7 +1,11 @@
-# The API on Fly.io (api.starter.example) and its scheduled jobs. Deployed first by
-# .github/workflows/deploy.yml; by hand: `fly deploy --config fly.api.toml`. Secrets (same set as
-# the web): docs/deploy.md.
-app = "starter-api"
+# The API (api.postula.intensoft.dev: REST, MCP, webhooks) and the worker on Fly.io, two process
+# groups of one app. Deployed first by .github/workflows/deploy.yml; by hand:
+# `fly deploy --config fly.api.toml`. Secrets (same set as the web): docs/deploy.md.
+#
+# Cost: the API stops when nobody calls it. The worker runs only while someone has "Búsqueda
+# activa" on: the panel and the AI start it through the Machines API (FLY_API_TOKEN) and it exits
+# by itself when everyone turns it off, so Fly leaves it stopped.
+app = "postula-api"
 primary_region = "iad"
 kill_signal = "SIGTERM"
 kill_timeout = "30s"
@@ -17,20 +21,29 @@ kill_timeout = "30s"
 [env]
   NODE_ENV = "production"
   PORT = "3001"
-  APP_URL = "https://app.starter.example"
-  API_URL = "https://api.starter.example"
+  APP_URL = "https://app.postula.intensoft.dev"
+  API_URL = "https://api.postula.intensoft.dev"
   CLIENT_IP_HEADER = "fly-client-ip"
+  WORKER_FLY_APP = "postula-api"
+  WORKER_PROCESS_GROUP = "worker"
 
 [processes]
   app = "sh -c 'cd /app/apps/api && exec node_modules/.bin/tsx --tsconfig tsconfig.run.json src/server.ts'"
+  worker = "sh -c 'cd /app/apps/api && exec node_modules/.bin/tsx --tsconfig tsconfig.run.json src/worker.ts'"
+
+# The worker exits with 0 when everyone turned the search off: it must stay stopped then.
+[[restart]]
+  policy = "on-failure"
+  retries = 5
+  processes = ["worker"]
 
 [http_service]
   internal_port = 3001
   force_https = true
-  # One machine, always on: the scheduled jobs live in this process.
-  auto_stop_machines = "off"
+  # Stops when idle and wakes on the next request: the jobs live in the worker, not here.
+  auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 1
+  min_machines_running = 0
   processes = ["app"]
 
   [http_service.concurrency]
@@ -47,4 +60,11 @@ kill_timeout = "30s"
 
 [[vm]]
   size = "shared-cpu-1x"
-  memory = "1gb"
+  memory = "512mb"
+  processes = ["app"]
+
+# Milestone 3 fills forms with Chromium here: then it needs 1gb.
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+  processes = ["worker"]

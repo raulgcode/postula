@@ -1,10 +1,11 @@
 {
-  "name": "@starter/api",
+  "name": "@postula/api",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch --tsconfig tsconfig.run.json src/server.ts",
+    "dev": "tsx watch --tsconfig tsconfig.run.json src/dev.ts",
     "start": "tsx --tsconfig tsconfig.run.json src/server.ts",
+    "worker": "tsx --tsconfig tsconfig.run.json src/worker.ts",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -12,17 +13,21 @@
     "@fastify/helmet": "catalog:",
     "@fastify/sensible": "catalog:",
     "@fastify/swagger": "catalog:",
-    "@starter/contracts": "workspace:*",
-    "@starter/core": "workspace:*",
-    "@starter/db": "workspace:*",
-    "@starter/email": "workspace:*",
-    "@starter/env": "workspace:*",
+    "@modelcontextprotocol/server": "catalog:",
+    "@postula/contracts": "workspace:*",
+    "@postula/fly": "workspace:*",
+    "@postula/core": "workspace:*",
+    "@postula/db": "workspace:*",
+    "@postula/email": "workspace:*",
+    "@postula/env": "workspace:*",
     "fastify": "catalog:",
     "fastify-type-provider-zod": "catalog:",
+    "pg-boss": "catalog:",
+    "pino": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@starter/tsconfig": "workspace:*",
+    "@postula/tsconfig": "workspace:*",
     "pino-pretty": "catalog:",
     "tsx": "catalog:"
   }

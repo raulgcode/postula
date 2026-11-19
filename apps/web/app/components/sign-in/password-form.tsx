@@ -1,6 +1,6 @@
 import { getFormProps, type SubmissionResult, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { passwordSignInSchema } from "@starter/contracts";
+import { passwordSignInSchema } from "@postula/contracts";
 import { Form, href, Link, useNavigation } from "react-router";
 import { TextField } from "~/components/text-field";
 import { Button } from "~/components/ui/button";

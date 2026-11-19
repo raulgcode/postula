@@ -2,7 +2,7 @@ import { expect, test } from "../support/fixtures";
 import { getLinkFromEmail, uniqueEmail } from "../support/mailpit";
 
 test.describe("Feature: sign in with an email link", () => {
-  test("Scenario: someone new asks for the link, opens it and lands on creating their workspace", async ({
+  test("Scenario: someone new asks for the link, opens it and lands on their home", async ({
     page,
     baseURL,
   }) => {
@@ -24,12 +24,10 @@ test.describe("Feature: sign in with an email link", () => {
       );
     });
 
-    await test.step("And opening it signs them in, on the onboarding", async () => {
+    await test.step("And opening it signs them in, on their home", async () => {
       await page.goto(await getLinkFromEmail(email, baseURL, "Your sign-in link"));
-      await expect(page).toHaveURL(/\/app\/onboarding$/);
-      await expect(
-        page.getByRole("heading", { level: 1, name: "Create your workspace" }),
-      ).toBeVisible();
+      await expect(page).toHaveURL(/\/app$/);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(/^Hi, /);
     });
   });
 
@@ -45,7 +43,7 @@ test.describe("Feature: sign in with an email link", () => {
 test.describe("Feature: account with email and password", () => {
   const password = "a-long-password";
 
-  test("Scenario: they create an account, confirm the email and get in to create their workspace", async ({
+  test("Scenario: they create an account, confirm the email and land on their home", async ({
     page,
     baseURL,
   }) => {
@@ -74,7 +72,7 @@ test.describe("Feature: account with email and password", () => {
 
     await test.step("And the confirmation link signs them in", async () => {
       await page.goto(await getLinkFromEmail(email, baseURL, "Confirm your email"));
-      await expect(page).toHaveURL(/\/app\/onboarding$/);
+      await expect(page).toHaveURL(/\/app$/);
     });
   });
 
@@ -106,7 +104,7 @@ test.describe("Feature: account with email and password", () => {
     await test.step("And with the right one they get in", async () => {
       await page.getByLabel("Password").fill(password);
       await page.getByRole("button", { name: "Sign in", exact: true }).click();
-      await expect(page).toHaveURL(/\/app\/onboarding$/);
+      await expect(page).toHaveURL(/\/app$/);
     });
   });
 
@@ -151,7 +149,7 @@ test.describe("Feature: account with email and password", () => {
       await page.getByLabel("Email").fill(email);
       await page.getByLabel("Password").fill("my-new-password");
       await page.getByRole("button", { name: "Sign in", exact: true }).click();
-      await expect(page).toHaveURL(/\/app\/onboarding$/);
+      await expect(page).toHaveURL(/\/app$/);
     });
   });
 });

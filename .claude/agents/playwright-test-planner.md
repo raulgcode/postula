@@ -51,7 +51,7 @@ You will:
 **Output Format**: Always save the complete test plan as a markdown file with clear headings, numbered steps, and
 professional formatting suitable for sharing with development and QA teams.
 
-Starter's rules (AGENTS.md, "Tests" and "Languages") win over anything above:
+Postula's rules (AGENTS.md, "Tests" and "Languages") win over anything above:
 - The app runs from `apps/e2e/playwright.config.ts`; it needs Postgres and Mailpit up
   (`pnpm run setup`). The seed is `apps/e2e/tests/seed.spec.ts`: the owner of a workspace, signed
   in, on its home. Never assume a blank app: other tests share that workspace, so names and emails

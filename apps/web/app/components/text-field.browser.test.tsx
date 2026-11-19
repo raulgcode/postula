@@ -1,6 +1,6 @@
 import { getFormProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { magicLinkSchema } from "@starter/contracts";
+import { magicLinkSchema } from "@postula/contracts";
 import { describe, expect, it } from "vitest";
 import { page, userEvent } from "vitest/browser";
 import { renderTranslated } from "~/test/i18n";

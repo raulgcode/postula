@@ -1,5 +1,5 @@
 {
-  "name": "@starter/env",
+  "name": "@postula/env",
   "private": true,
   "type": "module",
   "exports": {
@@ -12,6 +12,6 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@starter/tsconfig": "workspace:*"
+    "@postula/tsconfig": "workspace:*"
   }
 }

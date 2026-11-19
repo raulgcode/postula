@@ -1,5 +1,5 @@
 import { isIP } from "node:net";
-import { type Database, lt, schema, sql } from "@starter/db";
+import { type Database, lt, schema, sql } from "@postula/db";
 
 /** At most `limit` calls per `windowMs`, counted from the first call of the window. */
 export interface RateLimitRule {

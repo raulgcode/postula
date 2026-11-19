@@ -1,2 +1,2 @@
 -- Separate database for Vitest integration tests and Playwright runs.
-CREATE DATABASE starter_test OWNER starter;
+CREATE DATABASE postula_test OWNER postula;

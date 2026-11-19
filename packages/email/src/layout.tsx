@@ -13,7 +13,7 @@ import {
   MjmlText,
   MjmlTitle,
 } from "@faire/mjml-react";
-import { defaultLocale, type Locale } from "@starter/i18n";
+import { defaultLocale, type Locale } from "@postula/i18n";
 import type { ReactNode } from "react";
 import { type EmailPalette, emailPalette as palette } from "./brand";
 import { emailT } from "./i18n";

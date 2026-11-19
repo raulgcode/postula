@@ -1,5 +1,5 @@
-import { eq, schema } from "@starter/db";
-import { parseLocale } from "@starter/i18n";
+import { eq, schema } from "@postula/db";
+import { parseLocale } from "@postula/i18n";
 import { href, redirect } from "react-router";
 import { localeCookieHeader } from "~/lib/locale.server";
 import { safeRedirect } from "~/lib/safe-redirect";

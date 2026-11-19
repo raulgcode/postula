@@ -58,7 +58,7 @@ application behavior.
    ```
    </example-generation>
 
-Starter's rules (AGENTS.md, "Tests" and "Languages") win over anything above:
+Postula's rules (AGENTS.md, "Tests" and "Languages") win over anything above:
 - The app runs from `apps/e2e/playwright.config.ts`; it needs Postgres and Mailpit up
   (`pnpm run setup`). The seed is `apps/e2e/tests/seed.spec.ts`: the owner of a workspace, signed
   in, on its home. Never assume a blank app: other tests share that workspace, so names and emails
@@ -85,4 +85,4 @@ Starter's rules (AGENTS.md, "Tests" and "Languages") win over anything above:
   `networkidle` or `.only` (`pnpm lint` rejects them). Each Then uses web-first assertions on the
   exact value: `toHaveText`, `toContainText`, `toHaveValue`, `toHaveURL`, not only `toBeVisible`.
 - Run what you wrote on both projects (`test_run`) before you finish, and run `pnpm lint` and
-  `pnpm --filter @starter/e2e typecheck`.
+  `pnpm --filter @postula/e2e typecheck`.

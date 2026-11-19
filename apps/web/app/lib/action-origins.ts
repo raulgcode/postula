@@ -6,4 +6,4 @@
  * POST with 400. It is the host of APP_URL in fly.web.toml (the config is read at build time,
  * before that variable exists); `pnpm start project` sets it.
  */
-export const actionOrigins = ["app.starter.example"];
+export const actionOrigins = ["app.postula.intensoft.dev"];

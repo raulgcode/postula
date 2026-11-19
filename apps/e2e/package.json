@@ -1,5 +1,5 @@
 {
-  "name": "@starter/e2e",
+  "name": "@postula/e2e",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,10 +10,11 @@
   "devDependencies": {
     "@axe-core/playwright": "catalog:",
     "@playwright/test": "catalog:",
-    "@starter/core": "workspace:*",
-    "@starter/db": "workspace:*",
-    "@starter/env": "workspace:*",
-    "@starter/tsconfig": "workspace:*",
+    "@postula/contracts": "workspace:*",
+    "@postula/core": "workspace:*",
+    "@postula/db": "workspace:*",
+    "@postula/env": "workspace:*",
+    "@postula/tsconfig": "workspace:*",
     "@types/node": "catalog:"
   }
 }

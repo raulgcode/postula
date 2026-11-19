@@ -4,8 +4,8 @@ import {
   parseLocale,
   resolveLocale,
   type Translation,
-} from "@starter/i18n";
-import { dictionaries, type Messages, type Namespace } from "@starter/i18n/messages";
+} from "@postula/i18n";
+import { dictionaries, type Messages, type Namespace } from "@postula/i18n/messages";
 import { createCookie, type MiddlewareFunction, type RouterContextProvider } from "react-router";
 import { localeContext } from "../context";
 import type { T } from "./i18n";

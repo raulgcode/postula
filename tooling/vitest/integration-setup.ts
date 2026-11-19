@@ -1,5 +1,5 @@
-import { runMigrations } from "@starter/db/migrate";
-import { loadDotEnv } from "@starter/env";
+import { runMigrations } from "@postula/db/migrate";
+import { loadDotEnv } from "@postula/env";
 
 // Runs once before the integration project: brings the test database schema up to date.
 export default async function setup() {

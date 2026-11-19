@@ -1,5 +1,5 @@
 export const home = {
-  title: "Starter",
+  title: "Postula",
   description: "Your new project, ready to grow.",
   heading: "Your project already works",
   intro:

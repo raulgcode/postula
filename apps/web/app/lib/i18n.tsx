@@ -7,9 +7,9 @@ import {
   type ParamsArg,
   splitRich,
   type Translator,
-} from "@starter/i18n";
+} from "@postula/i18n";
 // Types only: the dictionaries themselves never reach the browser bundle.
-import type { Messages } from "@starter/i18n/messages";
+import type { Messages } from "@postula/i18n/messages";
 import { Fragment, type ReactNode } from "react";
 import { useMatches } from "react-router";
 
@@ -75,7 +75,7 @@ export function richText<K extends Key>(
 }
 
 /**
- * A text that may be a key, like a validation error from `@starter/contracts`. One that isn't a
+ * A text that may be a key, like a validation error from `@postula/contracts`. One that isn't a
  * key (a plain text) comes back as it is.
  */
 export function translateText(t: T, text: string): string {

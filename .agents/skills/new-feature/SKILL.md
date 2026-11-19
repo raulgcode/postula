@@ -20,7 +20,7 @@ each step. Full example in the repo: the workspace (`createWorkspaceSchema`,
 
 1. Table in `packages/db/src/schema/<topic>.ts`, with `organizationId` if it belongs to a
    workspace, and exported from `schema/index.ts`.
-2. `pnpm db:generate` (to name it: `pnpm --filter @starter/db generate --name <what>`) and
+2. `pnpm db:generate` (to name it: `pnpm --filter @postula/db generate --name <what>`) and
    `pnpm db:migrate`. Never write the migration by hand.
 
 ## 2. Contract
@@ -48,7 +48,7 @@ component.
 ## 5. Route
 
 1. Register it in `apps/web/app/routes.ts` (under `:workspace` if it belongs to the workspace) and
-   run `pnpm --filter @starter/web typecheck` to get `./+types/<route>`.
+   run `pnpm --filter @postula/web typecheck` to get `./+types/<route>`.
 2. `loader`: read with the use case using `context.get(tenantContext)`; return
    `i18n: translations(context, "<section>", "forms")`.
 3. `action`: `parseWithZod(await request.formData(), { schema })`; on failure,

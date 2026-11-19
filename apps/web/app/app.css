@@ -16,7 +16,7 @@
 /*
  * Theme tokens: light-dark(light, dark), resolved by `color-scheme` on <html>. Components use only
  * these (`bg-primary`, `text-muted-foreground`, …), never raw colors. app/lib/brand.test.ts checks
- * every text/surface pair for WCAG AA and that the emails (@starter/email/brand) match. To rebrand,
+ * every text/surface pair for WCAG AA and that the emails (@postula/email/brand) match. To rebrand,
  * change the values here and in packages/email/src/brand.ts, then run `pnpm test`.
  * System fonts keep the page inside the Lighthouse budget.
  */

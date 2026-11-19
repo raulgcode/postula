@@ -1,5 +1,5 @@
 {
-  "name": "@starter/email",
+  "name": "@postula/email",
   "private": true,
   "type": "module",
   "exports": {
@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@faire/mjml-react": "catalog:",
-    "@starter/env": "workspace:*",
-    "@starter/i18n": "workspace:*",
+    "@postula/env": "workspace:*",
+    "@postula/i18n": "workspace:*",
     "html-to-text": "catalog:",
     "mjml": "catalog:",
     "nodemailer": "catalog:",
@@ -20,7 +20,7 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@starter/tsconfig": "workspace:*",
+    "@postula/tsconfig": "workspace:*",
     "@types/html-to-text": "catalog:",
     "@types/nodemailer": "catalog:",
     "@types/react": "catalog:",

@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { loadDotEnv } from "@starter/env";
+import { loadDotEnv } from "@postula/env";
 
 loadDotEnv();
 
@@ -31,7 +31,7 @@ export default defineConfig({
   // schema comes first: the readiness probe opens the home page, which reads the session.
   webServer: {
     command:
-      "pnpm --filter @starter/db migrate && pnpm --filter @starter/web build && pnpm --filter @starter/web start",
+      "pnpm --filter @postula/db migrate && pnpm --filter @postula/web build && pnpm --filter @postula/web start",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

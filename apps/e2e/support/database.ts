@@ -1,6 +1,5 @@
-import type { Page } from "@playwright/test";
-import type { TenantContext } from "@starter/core";
-import { and, createDatabase, type Database, eq, schema } from "@starter/db";
+import type { TenantContext } from "@postula/core";
+import { createDatabase, type Database, eq, schema } from "@postula/db";
 
 /** The e2e database: the one the web server of playwright.config.ts runs against. */
 export function connectTestDatabase() {
@@ -9,32 +8,19 @@ export function connectTestDatabase() {
   return createDatabase(url);
 }
 
-/** A workspace of the test database, ready for `@starter/core`'s use cases. */
-export interface Workspace {
-  slug: string;
-  organizationId: string;
-  /** As its owner: what the panel would pass to core. */
+/** A person of the test database, ready for `@postula/core`'s use cases. */
+export interface Account {
+  email: string;
+  userId: string;
+  /** What the panel would pass to core: in Postula each person is their own tenant. */
   tenant: TenantContext;
 }
 
-/** The workspace in a panel URL (`/app/:workspace/…`). */
-export function slugOf(page: Page | string): string {
-  const url = typeof page === "string" ? page : page.url();
-  const slug = new URL(url).pathname.match(/^\/app\/([^/]+)/)?.[1];
-  if (!slug) throw new Error(`No workspace in ${url}`);
-  return slug;
-}
-
-export async function findWorkspace(db: Database, slug: string): Promise<Workspace> {
+export async function findAccount(db: Database, email: string): Promise<Account> {
   const [row] = await db
-    .select({ organizationId: schema.organization.id, userId: schema.member.userId })
-    .from(schema.organization)
-    .innerJoin(schema.member, eq(schema.member.organizationId, schema.organization.id))
-    .where(and(eq(schema.organization.slug, slug), eq(schema.member.role, "owner")));
-  if (!row) throw new Error(`No workspace ${slug}`);
-  return {
-    slug,
-    organizationId: row.organizationId,
-    tenant: { db, organizationId: row.organizationId, userId: row.userId, role: "owner" },
-  };
+    .select({ userId: schema.user.id })
+    .from(schema.user)
+    .where(eq(schema.user.email, email));
+  if (!row) throw new Error(`No account for ${email}`);
+  return { email, userId: row.userId, tenant: { db, userId: row.userId } };
 }
