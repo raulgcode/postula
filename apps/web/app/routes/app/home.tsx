@@ -1,26 +1,23 @@
-import { getWorkspace } from "@postula/core";
 import { PageHeader } from "~/components/page-header";
-import { sessionContext, tenantContext } from "~/context";
+import { sessionContext } from "~/context";
 import { metaT, useT } from "~/lib/i18n";
 import type { Route } from "./+types/home";
 
 export function meta({ matches }: Route.MetaArgs) {
-  return [{ title: metaT(matches)("workspace.homeTitle") }];
+  return [{ title: metaT(matches)("app.homeTitle") }];
 }
 
 export async function loader({ context }: Route.LoaderArgs) {
   const { user } = context.get(sessionContext);
-  const workspace = await getWorkspace(context.get(tenantContext));
-  return { name: user.name || user.email, workspace: workspace.name };
+  return { name: user.name || user.email };
 }
 
-/** The workspace's first screen: replace it with your project's. */
 export default function Home({ loaderData }: Route.ComponentProps) {
   const t = useT();
   return (
     <PageHeader
-      title={t("workspace.homeHeading", { name: loaderData.name })}
-      description={t("workspace.homeIntro", { workspace: loaderData.workspace })}
+      title={t("app.homeHeading", { name: loaderData.name })}
+      description={t("app.homeIntro")}
     />
   );
 }

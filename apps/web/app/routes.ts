@@ -16,14 +16,10 @@ export default [
     ? []
     : [route("dev/sign-in", "routes/dev/sign-in.tsx")]),
   ...prefix("app", [
+    // Everything under /app has a signed-in person, who is their own tenant.
     layout("routes/app/layout.tsx", [
-      index("routes/app/open-workspace.ts"),
-      route("onboarding", "routes/app/onboarding.tsx"),
-      // Workspace slugs always end in a random suffix, so they never match the paths above.
-      route(":workspace", "routes/app/workspace-layout.tsx", [
-        index("routes/app/home.tsx"),
-        route("settings", "routes/app/settings.tsx"),
-      ]),
+      index("routes/app/home.tsx"),
+      route("settings", "routes/app/settings.tsx"),
     ]),
   ]),
 ] satisfies RouteConfig;

@@ -78,7 +78,7 @@ export default function App() {
   return <Outlet />;
 }
 
-// A middleware that throws before the loaders run (a workspace that isn't yours) leaves the root
+// A middleware that throws before the loaders run (a page that isn't yours) leaves the root
 // without loader data, and so without `common`: these few texts stay in the bundle, in English.
 const errorTexts = {
   common: {

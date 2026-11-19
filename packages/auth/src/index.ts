@@ -6,7 +6,5 @@ export {
   type AuthSession,
   type CreateAuthOptions,
   createAuth,
-  defaultOrganizationId,
-  disabledOrganizationPaths,
   type RateLimitStorage,
 } from "./auth";

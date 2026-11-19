@@ -1,5 +1,4 @@
-import { eq, schema } from "@postula/db";
-import { createTestDatabase, createTestTenant, createTestUser } from "@postula/db/testing";
+import { createTestDatabase, createTestTenant } from "@postula/db/testing";
 import type { SendEmailInput } from "@postula/email";
 import type { AuthMethod } from "@postula/env";
 import { afterAll, describe, expect, it } from "vitest";
@@ -114,48 +113,6 @@ describe("magic link", () => {
   });
 });
 
-async function activeOrganizationOf(sessionId: string) {
-  const [row] = await connection.db
-    .select({ id: schema.session.activeOrganizationId })
-    .from(schema.session)
-    .where(eq(schema.session.id, sessionId));
-  return row?.id;
-}
-
-describe("active workspace on sign-in", () => {
-  it("opens the person's workspace on every new session", async () => {
-    const tenant = await createTestTenant(connection.db);
-
-    const internal = (await authWith().$context).internalAdapter;
-    const session = await internal.createSession(tenant.userId);
-
-    expect(await activeOrganizationOf(session.id)).toBe(tenant.organizationId);
-  });
-
-  it("leaves the session without a workspace until they create one", async () => {
-    const userId = await createTestUser(connection.db);
-
-    const session = await (await authWith().$context).internalAdapter.createSession(userId);
-
-    expect(await activeOrganizationOf(session.id)).toBeNull();
-  });
-
-  it("with several workspaces, opens the one used in the last session", async () => {
-    const first = await createTestTenant(connection.db);
-    const second = await createTestTenant(connection.db, { userId: first.userId });
-    const internal = (await authWith().$context).internalAdapter;
-    const previous = await internal.createSession(first.userId);
-    await connection.db
-      .update(schema.session)
-      .set({ activeOrganizationId: second.organizationId })
-      .where(eq(schema.session.id, previous.id));
-
-    const session = await internal.createSession(first.userId);
-
-    expect(await activeOrganizationOf(session.id)).toBe(second.organizationId);
-  });
-});
-
 describe("entrar como cualquiera (solo /dev/sign-in en pnpm dev)", () => {
   const devAuth = () =>
     createAuth({
@@ -204,9 +161,9 @@ describe("entrar como cualquiera (solo /dev/sign-in en pnpm dev)", () => {
   });
 });
 
-describe("member and workspace endpoints don't exist over HTTP", () => {
+describe("there are no shared workspaces: each person is their own tenant", () => {
   it.each(["invite-member", "update-member-role", "remove-member", "create"])(
-    "/organization/%s responde 404",
+    "/organization/%s answers 404",
     async (path) => {
       const response = await authWith().handler(
         new Request(`${baseURL}/api/auth/organization/${path}`, {

@@ -1,4 +1,4 @@
-import { and, asc, type Database, desc, eq, isNotNull, schema, sql } from "@postula/db";
+import { type Database, schema } from "@postula/db";
 import {
   AccountEmail,
   accountEmailSubject,
@@ -10,70 +10,13 @@ import type { AuthMethod } from "@postula/env";
 import { defaultLocale, parseLocale } from "@postula/i18n";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { magicLink, organization } from "better-auth/plugins";
+import { magicLink } from "better-auth/plugins";
 import { createElement } from "react";
 import { devSignIn } from "./dev-sign-in";
-
-/**
- * The workspace a new session opens with: the one the user had open in their latest session,
- * if they are still a member, otherwise the first workspace they joined.
- */
-export async function defaultOrganizationId(db: Database, userId: string) {
-  const [lastUsed] = await db
-    .select({ organizationId: schema.member.organizationId })
-    .from(schema.session)
-    .innerJoin(
-      schema.member,
-      and(
-        eq(schema.member.userId, schema.session.userId),
-        // session.active_organization_id is text (Better Auth's schema); organization ids are uuid.
-        eq(sql`${schema.member.organizationId}::text`, schema.session.activeOrganizationId),
-      ),
-    )
-    .where(and(eq(schema.session.userId, userId), isNotNull(schema.session.activeOrganizationId)))
-    .orderBy(desc(schema.session.createdAt))
-    .limit(1);
-  if (lastUsed) return lastUsed.organizationId;
-
-  const [membership] = await db
-    .select({ organizationId: schema.member.organizationId })
-    .from(schema.member)
-    .where(eq(schema.member.userId, userId))
-    .orderBy(asc(schema.member.createdAt))
-    .limit(1);
-  return membership?.organizationId;
-}
 
 export type RateLimitStorage = NonNullable<
   NonNullable<BetterAuthOptions["rateLimit"]>["customStorage"]
 >;
-
-/**
- * Members and invitations go through @postula/core (with its own checks), so Better Auth's own
- * endpoints for them are off over HTTP: without this, any member could invite, promote or remove
- * people by calling them directly. The server keeps using `auth.api` after its own checks.
- */
-export const disabledOrganizationPaths = [
-  "/organization/invite-member",
-  "/organization/accept-invitation",
-  "/organization/reject-invitation",
-  "/organization/cancel-invitation",
-  "/organization/get-invitation",
-  "/organization/list-invitations",
-  "/organization/list-user-invitations",
-  "/organization/add-member",
-  "/organization/remove-member",
-  "/organization/update-member-role",
-  "/organization/leave",
-  "/organization/update",
-  "/organization/delete",
-  "/organization/list-members",
-  "/organization/get-full-organization",
-  // Workspaces are created by the onboarding (`auth.api` on the server), which picks the slug
-  // with its random suffix; over HTTP anyone could take "settings" or a brand's name.
-  "/organization/create",
-  "/organization/check-slug",
-];
 
 export interface CreateAuthOptions {
   db: Database;
@@ -135,7 +78,6 @@ export function createAuth({
     secret,
     trustedOrigins: [baseURL, ...trustedOrigins],
     rateLimit: { enabled: rateLimit, customStorage: rateLimitStorage },
-    disabledPaths: disabledOrganizationPaths,
     database: drizzleAdapter(db, { provider: "pg", schema }),
     user: {
       additionalFields: {
@@ -171,19 +113,6 @@ export function createAuth({
           },
         }
       : undefined,
-    databaseHooks: {
-      session: {
-        create: {
-          // A new sign-in reopens the workspace used last; without it they'd land in onboarding.
-          async before(session) {
-            if (session.activeOrganizationId) return;
-            const activeOrganizationId = await defaultOrganizationId(db, session.userId);
-            if (!activeOrganizationId) return;
-            return { data: { ...session, activeOrganizationId } };
-          },
-        },
-      },
-    },
     advanced: {
       database: { generateId: "uuid" },
       ipAddress: clientIpHeader ? { ipAddressHeaders: [clientIpHeader] } : undefined,
@@ -205,7 +134,6 @@ export function createAuth({
           });
         },
       }),
-      organization({ creatorRole: "owner" }),
       devSignIn(devSignInEnabled),
     ],
   });

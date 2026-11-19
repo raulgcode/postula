@@ -51,19 +51,16 @@ test.describe("Feature: the app protects itself in the browser", () => {
     expect(response?.status()).toBe(404);
   });
 
-  ownerTest(
-    "Scenario: the workspace loads without breaking the content policy",
-    async ({ page, workspace }) => {
-      const violations = cspViolations(page);
+  ownerTest("Scenario: the panel loads without breaking the content policy", async ({ page }) => {
+    const violations = cspViolations(page);
 
-      await test.step("When the owner opens the workspace and moves around", async () => {
-        await page.goto(`/app/${workspace.slug}`);
-        await openSection(page, "Settings");
-      });
+    await test.step("When the person opens the panel and moves around", async () => {
+      await page.goto("/app");
+      await openSection(page, "Settings");
+    });
 
-      await test.step("Then nothing was blocked", async () => {
-        expect(violations).toEqual([]);
-      });
-    },
-  );
+    await test.step("Then nothing was blocked", async () => {
+      expect(violations).toEqual([]);
+    });
+  });
 });

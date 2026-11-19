@@ -10,8 +10,5 @@ export const forms = {
   passwordTooLong: "Use up to 128 characters",
   nameRequired: "Enter your name",
   nameTooLong: "Your name can be up to 80 characters",
-  workspaceNameRequired: "Enter your workspace's name",
-  workspaceNameTooShort: "The name needs at least 2 characters",
-  workspaceNameTooLong: "The name can be up to 80 characters",
   tooManyAttempts: "Too many tries. Wait a few minutes and try again.",
 } as const;

@@ -6,7 +6,7 @@ import { createContext } from "react-router";
 /** Set by `requireSession` for every route under /app. */
 export const sessionContext = createContext<AuthSession>();
 
-/** Set by `requireTenant`: the workspace in the URL, ready to pass to @postula/core. */
+/** Set by `requireTenant`: the signed-in person as a tenant, ready to pass to @postula/core. */
 export const tenantContext = createContext<TenantContext>();
 
 /** Set by `localeMiddleware` in root.tsx (and by `requireSession` from the account): the page's language. */

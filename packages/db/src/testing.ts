@@ -13,34 +13,15 @@ export function createTestDatabase(): DatabaseConnection {
 }
 
 export interface TestTenant {
-  organizationId: string;
-  slug: string;
   userId: string;
-  role: string;
 }
 
-export interface TestTenantOptions {
-  /** Adds the workspace to this existing user instead of creating a new owner. */
-  userId?: string;
-  role?: string;
-}
-
-/** Creates an isolated workspace + owner, so tests never share rows. */
-export async function createTestTenant(
-  db: Database,
-  { userId, role = "owner" }: TestTenantOptions = {},
-): Promise<TestTenant> {
-  const suffix = randomUUID().slice(0, 8);
-  const [org] = await db
-    .insert(schema.organization)
-    .values({ name: `Test ${suffix}`, slug: `test-${suffix}`, createdAt: new Date() })
-    .returning({ id: schema.organization.id, slug: schema.organization.slug });
-  if (!org) throw new Error("Failed to create test tenant");
-  const ownerId = userId ?? (await createTestUser(db, suffix));
-  await db
-    .insert(schema.member)
-    .values({ organizationId: org.id, userId: ownerId, role, createdAt: new Date() });
-  return { organizationId: org.id, slug: org.slug, userId: ownerId, role };
+/**
+ * Creates a person of their own, so tests never share rows. In Postula each person is their own
+ * tenant: every row hangs from `user_id`.
+ */
+export async function createTestTenant(db: Database): Promise<TestTenant> {
+  return { userId: await createTestUser(db) };
 }
 
 export async function createTestUser(db: Database, suffix = randomUUID().slice(0, 8)) {

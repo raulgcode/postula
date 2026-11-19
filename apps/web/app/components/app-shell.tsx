@@ -14,27 +14,21 @@ interface NavItem {
 }
 
 /**
- * The layout of a workspace. On the phone the sections are a bar at the bottom, in reach of the
+ * The layout of the panel. On the phone the sections are a bar at the bottom, in reach of the
  * thumb; from 768 px they move to a side menu. A new section is one more item in `items`.
  */
-export function AppShell({
-  workspace,
-  children,
-}: {
-  workspace: { name: string; slug: string };
-  children: React.ReactNode;
-}) {
+export function AppShell({ children }: { children: React.ReactNode }) {
   const t = useT();
   const items: NavItem[] = [
     {
-      to: href("/app/:workspace", { workspace: workspace.slug }),
-      label: t("workspace.navHome"),
+      to: href("/app"),
+      label: t("app.navHome"),
       icon: HomeIcon,
       end: true,
     },
     {
-      to: href("/app/:workspace/settings", { workspace: workspace.slug }),
-      label: t("workspace.navSettings"),
+      to: href("/app/settings"),
+      label: t("app.navSettings"),
       icon: SettingsIcon,
     },
   ];
@@ -49,14 +43,14 @@ export function AppShell({
       </a>
       <aside className="hidden border-r bg-sidebar md:flex md:flex-col md:gap-6 md:p-4">
         <div className="flex items-center justify-between gap-2">
-          <Logo name={workspace.name} className="min-w-0 truncate" />
+          <Logo name="Postula" className="min-w-0 truncate" />
           <ThemeToggle />
         </div>
-        <Nav items={items} label={t("workspace.navLabel")} variant="side" />
+        <Nav items={items} label={t("app.navLabel")} variant="side" />
       </aside>
       <div className="flex min-w-0 flex-col pb-20 md:pb-0">
         <header className="flex items-center justify-between border-b px-4 py-2 md:hidden">
-          <Logo name={workspace.name} className="min-w-0 truncate" />
+          <Logo name="Postula" className="min-w-0 truncate" />
           <ThemeToggle />
         </header>
         <main id="content" className="mx-auto w-full max-w-4xl flex-1 px-4 py-6 md:px-8">
@@ -64,7 +58,7 @@ export function AppShell({
         </main>
       </div>
       <div className="fixed inset-x-0 bottom-0 border-t bg-background pb-[env(safe-area-inset-bottom)] md:hidden">
-        <Nav items={items} label={t("workspace.navLabel")} variant="bottom" />
+        <Nav items={items} label={t("app.navLabel")} variant="bottom" />
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ import {
   type Page,
 } from "@playwright/test";
 import type { Database } from "@postula/db";
-import { connectTestDatabase, findWorkspace, slugOf, type Workspace } from "./database";
+import { type Account, connectTestDatabase, findAccount } from "./database";
 import { getLinkFromEmail, uniqueEmail } from "./mailpit";
 
 interface Fixtures {
@@ -20,10 +20,8 @@ interface Fixtures {
    * come back as an existing one.
    */
   signIn: (page: Page, email?: string) => Promise<string>;
-  /** Signs a new person in and creates their workspace, landing on its home. */
-  signInWithWorkspace: (page: Page, workspaceName?: string) => Promise<string>;
-  /** The workspace of the page (`/app/:workspace/…`), to seed it through core. */
-  workspaceOf: (page: Page) => Promise<Workspace>;
+  /** The account behind an email, to seed it through core. */
+  accountOf: (email: string) => Promise<Account>;
   /**
    * Another browser of someone else (a teammate, the owner's other device), in the test's
    * language unless `options` says otherwise. Closed when the test ends, even if it fails.
@@ -35,10 +33,10 @@ interface WorkerFixtures {
   /** The e2e database, one connection per worker: seed data with `@postula/core`, not SQL. */
   db: Database;
   /**
-   * Session of an owner with a workspace ("My company"), created once per worker through the
-   * real magic link and reused by every `ownerTest` in that worker.
+   * Session of a signed-in person, created once per worker through the real magic link and
+   * reused by every `ownerTest` in that worker.
    */
-  ownerSession: { storageState: string; slug: string };
+  ownerSession: { storageState: string; email: string };
 }
 
 async function signInThroughEmail(
@@ -54,14 +52,6 @@ async function signInThroughEmail(
   return email;
 }
 
-/** Creates the workspace from the onboarding, landing on its home. */
-export async function createWorkspace(page: Page, name: string): Promise<void> {
-  await expect(page).toHaveURL(/\/app\/onboarding$/);
-  await page.getByLabel("Workspace name").fill(name);
-  await page.getByRole("button", { name: "Continue" }).click();
-  await expect(page).toHaveURL(/\/app\/[a-z0-9-]+-[0-9a-f]{6}$/);
-}
-
 async function createOwnerSession(
   browser: Browser,
   { baseURL, locale }: { baseURL: string; locale?: string },
@@ -71,12 +61,11 @@ async function createOwnerSession(
   // answer in the machine's language.
   const context = await browser.newContext({ baseURL, locale });
   const page = await context.newPage();
-  await signInThroughEmail(page, baseURL);
-  await createWorkspace(page, "My company");
+  const email = await signInThroughEmail(page, baseURL);
+  await expect(page).toHaveURL(/\/app$/);
   await context.storageState({ path });
-  const slug = slugOf(page);
   await context.close();
-  return slug;
+  return email;
 }
 
 export const test = base.extend<Fixtures, WorkerFixtures>({
@@ -96,12 +85,12 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
       const dir = workerInfo.project.outputDir;
       mkdirSync(dir, { recursive: true });
       const storageState = `${dir}/owner-${workerInfo.workerIndex}.json`;
-      const slug = await createOwnerSession(
+      const email = await createOwnerSession(
         browser,
         { baseURL, locale: workerInfo.project.use.locale },
         storageState,
       );
-      await use({ storageState, slug });
+      await use({ storageState, email });
     },
     { scope: "worker" },
   ],
@@ -127,15 +116,8 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   signIn: async ({ baseURL }, use) => {
     await use((page, email) => signInThroughEmail(page, baseURL, email));
   },
-  signInWithWorkspace: async ({ signIn }, use) => {
-    await use(async (page, workspaceName = "My company") => {
-      const email = await signIn(page);
-      await createWorkspace(page, workspaceName);
-      return email;
-    });
-  },
-  workspaceOf: async ({ db }, use) => {
-    await use((page) => findWorkspace(db, slugOf(page)));
+  accountOf: async ({ db }, use) => {
+    await use((email) => findAccount(db, email));
   },
   newVisitor: async ({ browser, baseURL, locale }, use) => {
     const contexts: BrowserContext[] = [];
@@ -155,14 +137,14 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
 });
 
 /**
- * Tests that start already signed in as the worker's owner. Use it whenever the test does not
+ * Tests that start already signed in as the worker's person. Use it whenever the test does not
  * need a brand-new account; use `test` + `signIn` for flows that must start from zero
- * (login, onboarding, an empty workspace).
+ * (sign-in, an empty account, anything that changes the account).
  */
-export const ownerTest = test.extend<{ workspace: Workspace }>({
+export const ownerTest = test.extend<{ account: Account }>({
   storageState: ({ ownerSession }, use) => use(ownerSession.storageState),
-  /** The worker's workspace, already created: seed it through core without visiting /app. */
-  workspace: ({ db, ownerSession }, use) => findWorkspace(db, ownerSession.slug).then(use),
+  /** The worker's account, already signed in: seed it through core without visiting /app. */
+  account: ({ db, ownerSession }, use) => findAccount(db, ownerSession.email).then(use),
 });
 
 export { expect };

@@ -28,7 +28,7 @@ async function renderError(
 
 describe("ErrorPage", () => {
   it("tells the person the page doesn't exist and takes them home", async () => {
-    const screen = await renderError("/app/other-workspace", { status: 404 });
+    const screen = await renderError("/app/missing", { status: 404 });
     await expect
       .element(screen.getByRole("heading", { level: 1 }))
       .toHaveTextContent("We couldn't find this page");
