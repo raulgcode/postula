@@ -1,7 +1,6 @@
 import { createDatabase } from "@postula/db";
 import { getServerEnv } from "@postula/env";
 import { buildApp } from "./app";
-import { scheduleRateLimitCleanup } from "./jobs/rate-limits";
 
 const env = getServerEnv();
 const port = Number(process.env.PORT ?? 3001);
@@ -14,12 +13,8 @@ const app = await buildApp({
   logger: env.NODE_ENV === "development" ? { transport: { target: "pino-pretty" } } : true,
 });
 
-// Scheduled jobs live in this process (one machine on Fly, see fly.api.toml). Each returns its stop.
-const stops = [scheduleRateLimitCleanup({ db: connection.db, log: app.log })];
-
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, async () => {
-    for (const stop of stops) stop();
     await app.close();
     await connection.close();
     process.exit(0);

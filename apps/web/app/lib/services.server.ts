@@ -1,8 +1,9 @@
 import { createAuth, type RateLimitStorage } from "@postula/auth";
-import { hitRateLimit } from "@postula/core";
+import { type CoreServices, hitRateLimit } from "@postula/core";
 import { createDatabase } from "@postula/db";
 import { createMailer } from "@postula/email";
 import { deriveSecret, getServerEnv, googleCredentials } from "@postula/env";
+import { workerMachinesFromEnv } from "@postula/fly";
 
 // Server-only singletons. Cached on globalThis so dev HMR doesn't open a new pool per reload.
 function singleton<T>(name: string, create: () => T): T {
@@ -52,3 +53,6 @@ export const auth = singleton("__postulaAuth", () =>
 
 /** How people sign in here (AUTH_METHODS), for /login and the pages that depend on it. */
 export const authMethods = env.AUTH_METHODS;
+
+/** What core's operations reach besides the database: the worker's machines for the switch. */
+export const coreServices: CoreServices = { machines: workerMachinesFromEnv(env) };

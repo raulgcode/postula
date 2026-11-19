@@ -19,6 +19,7 @@
     "@postula/auth": "workspace:*",
     "@postula/contracts": "workspace:*",
     "@postula/core": "workspace:*",
+    "@postula/fly": "workspace:*",
     "@postula/db": "workspace:*",
     "@postula/email": "workspace:*",
     "@postula/env": "workspace:*",

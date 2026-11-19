@@ -1,6 +1,6 @@
 import { index, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-// Platform protection, not workspace data: no organization_id here.
+// Platform protection, not anyone's data: no user_id here.
 
 /**
  * How many times a key (an IP, an email, an API key) asked for something in the current

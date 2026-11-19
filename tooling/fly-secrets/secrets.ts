@@ -2,7 +2,15 @@
  * Which variables of a production .env become Fly secrets, and what would break production.
  * The URLs, the IP header and NODE_ENV live in fly.*.toml; the rest are local tools.
  */
-export const setInFlyToml = ["NODE_ENV", "PORT", "APP_URL", "API_URL", "CLIENT_IP_HEADER"];
+export const setInFlyToml = [
+  "NODE_ENV",
+  "PORT",
+  "APP_URL",
+  "API_URL",
+  "CLIENT_IP_HEADER",
+  "WORKER_FLY_APP",
+  "WORKER_PROCESS_GROUP",
+];
 
 const localOnly = ["TEST_DATABASE_URL", "MAILPIT_URL"];
 

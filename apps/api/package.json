@@ -3,8 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch --tsconfig tsconfig.run.json src/server.ts",
+    "dev": "tsx watch --tsconfig tsconfig.run.json src/dev.ts",
     "start": "tsx --tsconfig tsconfig.run.json src/server.ts",
+    "worker": "tsx --tsconfig tsconfig.run.json src/worker.ts",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -19,6 +20,8 @@
     "@postula/env": "workspace:*",
     "fastify": "catalog:",
     "fastify-type-provider-zod": "catalog:",
+    "pg-boss": "catalog:",
+    "pino": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

@@ -81,6 +81,11 @@ export const serverEnvSchema = z
     CLIENT_IP_HEADER: z.string().trim().toLowerCase().default("fly-client-ip"),
     GOOGLE_CLIENT_ID: optionalString,
     GOOGLE_CLIENT_SECRET: optionalString,
+    // "Búsqueda activa": a Fly token that may start and stop the worker's machines. Without it
+    // (on a laptop) the switch only saves the choice and you run the worker with `pnpm dev`.
+    FLY_API_TOKEN: optionalString,
+    WORKER_FLY_APP: z.string().trim().default("postula-api"),
+    WORKER_PROCESS_GROUP: z.string().trim().default("worker"),
     ...databaseEnvSchema.shape,
     ...emailEnvSchema.shape,
   })
