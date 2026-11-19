@@ -4,7 +4,7 @@ export {
   hashOAuthToken,
 } from "./ai-connections";
 export { listAudit } from "./audit";
-export { DomainError, NotFoundError } from "./errors";
+export { DomainError, InvalidProfileError, NotFoundError } from "./errors";
 export { localWorkerMachines, type WorkerMachines } from "./machines";
 export {
   type CoreServices,
@@ -15,6 +15,16 @@ export {
   runOperation,
 } from "./operations";
 export {
+  deleteProfileItem,
+  getProfile,
+  getProfileItem,
+  importProfile,
+  moveProfileItem,
+  saveProfileHeader,
+  saveProfileItem,
+  sortProfileItems,
+} from "./profile";
+export {
   clientAddress,
   hitRateLimit,
   pruneRateLimits,
@@ -23,11 +33,17 @@ export {
 } from "./rate-limits";
 export {
   apagarBusqueda,
+  borrarItemPerfil,
+  editarPerfil,
   encenderBusqueda,
   estadoBusqueda,
+  guardarItemPerfil,
+  importarPerfil,
+  moverItemPerfil,
   operations,
   searchSwitchOperation,
   verAuditoria,
+  verPerfil,
 } from "./registry";
 export {
   anySearchActive,

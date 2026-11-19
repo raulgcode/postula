@@ -5,6 +5,7 @@ import { common } from "./common";
 import { email } from "./email";
 import { forms } from "./forms";
 import { home } from "./home";
+import { profile } from "./profile";
 import { settings } from "./settings";
 
 /** The source language. A new namespace is added here and in `es/index.ts`. */
@@ -16,5 +17,6 @@ export const en = {
   email,
   forms,
   home,
+  profile,
   settings,
 } as const;

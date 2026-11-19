@@ -1,4 +1,4 @@
-import { HomeIcon, type LucideIcon, SettingsIcon } from "lucide-react";
+import { HomeIcon, type LucideIcon, SettingsIcon, UserRoundIcon } from "lucide-react";
 import type * as React from "react";
 import { href, NavLink } from "react-router";
 import { Logo } from "~/components/logo";
@@ -25,6 +25,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       label: t("app.navHome"),
       icon: HomeIcon,
       end: true,
+    },
+    {
+      to: href("/app/profile"),
+      label: t("app.navProfile"),
+      icon: UserRoundIcon,
     },
     {
       to: href("/app/settings"),

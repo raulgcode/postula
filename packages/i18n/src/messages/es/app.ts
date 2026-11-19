@@ -4,6 +4,7 @@ import type { en } from "../en";
 /** /app: el layout del panel y su inicio. */
 export const app = {
   navHome: "Inicio",
+  navProfile: "Perfil",
   navSettings: "Ajustes",
   navLabel: "Menú principal",
   homeTitle: "Inicio",

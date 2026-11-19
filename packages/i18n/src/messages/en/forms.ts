@@ -11,4 +11,12 @@ export const forms = {
   nameRequired: "Enter your name",
   nameTooLong: "Your name can be up to 80 characters",
   tooManyAttempts: "Too many tries. Wait a few minutes and try again.",
+  fieldRequired: "Fill this in",
+  fieldTooLong: "This is too long",
+  yearMonthInvalid: "Write the year, or the year and month: 2024 or 2024-03",
+  listRequired: "Add at least one",
+  listTooLong: "That's too many: up to 60",
+  jsonInvalid: "This isn't a profile Postula can read. Check that it's the whole JSON file.",
+  jsonInvalidItem:
+    "The item “{id}” is missing something or has a field written wrong. Fix it and load again.",
 } as const;

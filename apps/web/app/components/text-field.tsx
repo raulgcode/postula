@@ -19,7 +19,7 @@ type InputType =
 
 export interface TextFieldProps
   extends Omit<React.ComponentProps<"input">, "type" | "name" | "id" | "defaultValue"> {
-  field: FieldMetadata<string | number | undefined>;
+  field: FieldMetadata<string | number | null | undefined>;
   label: string;
   type?: InputType;
   description?: string;

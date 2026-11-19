@@ -4,7 +4,14 @@ const schemes = ["light", "dark"] as const;
 // Public pages, before signing in.
 const publicPages = ["/", "/login", "/login?with=link", "/sign-up", "/forgot-password"];
 // Sections of the panel, after /app. A new section goes here.
-const panelSections = ["", "/settings"];
+const panelSections = [
+  "",
+  "/settings",
+  "/profile",
+  "/profile/edit",
+  "/profile/import",
+  "/profile/items/new?kind=experience",
+];
 // Pages of a signed-in person outside the panel. The consent page with a real request is checked
 // in ai-connection.spec.ts; without one it says the request expired.
 const signedInPages = ["/oauth/consent"];

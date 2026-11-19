@@ -1,6 +1,7 @@
 /** /app: the panel's layout and its home. */
 export const app = {
   navHome: "Home",
+  navProfile: "Profile",
   navSettings: "Settings",
   navLabel: "Main menu",
   homeTitle: "Home",

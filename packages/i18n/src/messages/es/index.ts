@@ -7,6 +7,7 @@ import { common } from "./common";
 import { email } from "./email";
 import { forms } from "./forms";
 import { home } from "./home";
+import { profile } from "./profile";
 import { settings } from "./settings";
 
 export const es = {
@@ -17,5 +18,6 @@ export const es = {
   email,
   forms,
   home,
+  profile,
   settings,
 } as const satisfies Translation<typeof en>;

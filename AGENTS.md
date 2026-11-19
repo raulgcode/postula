@@ -240,6 +240,16 @@ any machine answers any call). Claude, ChatGPT and the editors connect with OAut
 - Every tool has `title` and the `readOnlyHint`, `destructiveHint` and `idempotentHint`
   annotations, taken from the operation.
 
+### The master profile
+
+Everything true about the person that a CV or a letter may say (`/app/profile`,
+`core/src/profile.ts`, `contracts/src/profile.ts`): a header and items of seven kinds
+(`profileItemKinds`), achievements hanging from a job or project (`parentId`). Each item's
+`data` follows its kind's schema; ids never change because generated documents cite them. Every
+change records a `profile_version` (only when the SHA-256 of the snapshot changed), and scores
+and documents point to the version they read. `importar_perfil` replaces it all from a JSON CV
+(the panel's "Load a CV" pastes the same JSON) and says which item is wrong.
+
 ### The worker and "Búsqueda activa"
 
 The `worker` process group of `postula-api` (`apps/api/src/worker.ts`) runs the pg-boss queue

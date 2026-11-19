@@ -25,6 +25,10 @@ export default [
     // Everything under /app has a signed-in person, who is their own tenant.
     layout("routes/app/layout.tsx", [
       index("routes/app/home.tsx"),
+      route("profile", "routes/app/profile.tsx"),
+      route("profile/edit", "routes/app/profile.edit.tsx"),
+      route("profile/import", "routes/app/profile.import.tsx"),
+      route("profile/items/:itemId", "routes/app/profile.item.tsx"),
       route("settings", "routes/app/settings.tsx"),
     ]),
   ]),

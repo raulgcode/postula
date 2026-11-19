@@ -18,4 +18,12 @@ export const forms = {
   nameRequired: "Escribe tu nombre",
   nameTooLong: "Tu nombre puede tener hasta 80 caracteres",
   tooManyAttempts: "Demasiados intentos. Espera unos minutos y vuelve a probar.",
+  fieldRequired: "Completa este campo",
+  fieldTooLong: "Es demasiado largo",
+  yearMonthInvalid: "Escribe el año, o el año y el mes: 2024 o 2024-03",
+  listRequired: "Agrega al menos uno",
+  listTooLong: "Son demasiados: hasta 60",
+  jsonInvalid: "Postula no puede leer este perfil. Revisa que sea el JSON completo.",
+  jsonInvalidItem:
+    "Al elemento “{id}” le falta algo o tiene un campo mal escrito. Corrígelo y vuelve a cargar.",
 } as const satisfies Translation<typeof en>["forms"];
