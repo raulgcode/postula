@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
-import type { TenantContext } from "@starter/core";
-import { and, createDatabase, type Database, eq, schema } from "@starter/db";
+import type { TenantContext } from "@postula/core";
+import { and, createDatabase, type Database, eq, schema } from "@postula/db";
 
 /** The e2e database: the one the web server of playwright.config.ts runs against. */
 export function connectTestDatabase() {
@@ -9,7 +9,7 @@ export function connectTestDatabase() {
   return createDatabase(url);
 }
 
-/** A workspace of the test database, ready for `@starter/core`'s use cases. */
+/** A workspace of the test database, ready for `@postula/core`'s use cases. */
 export interface Workspace {
   slug: string;
   organizationId: string;

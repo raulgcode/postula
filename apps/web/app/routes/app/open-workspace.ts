@@ -1,4 +1,4 @@
-import { listMemberships } from "@starter/core";
+import { listMemberships } from "@postula/core";
 import { href, redirect } from "react-router";
 import { sessionContext } from "~/context";
 import { db } from "~/lib/services.server";

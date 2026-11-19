@@ -82,7 +82,7 @@ export default function App() {
 // without loader data, and so without `common`: these few texts stay in the bundle, in English.
 const errorTexts = {
   common: {
-    appName: "Starter",
+    appName: "Postula",
     errorTitle: "Oops, something went wrong",
     errorDetails: "It wasn't your fault. Try again in a moment.",
     errorStatus: "Error {status}",

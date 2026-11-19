@@ -1,7 +1,7 @@
 import { getFormProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { APIError } from "@starter/auth";
-import { resetPasswordSchema } from "@starter/contracts";
+import { APIError } from "@postula/auth";
+import { resetPasswordSchema } from "@postula/contracts";
 import { data, Form, href, Link, useNavigation } from "react-router";
 import { StandalonePage } from "~/components/standalone-page";
 import { TextField } from "~/components/text-field";

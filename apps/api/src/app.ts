@@ -2,8 +2,8 @@ import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import sensible from "@fastify/sensible";
 import swagger from "@fastify/swagger";
-import { DomainError, NotFoundError } from "@starter/core";
-import type { Database } from "@starter/db";
+import { DomainError, NotFoundError } from "@postula/core";
+import type { Database } from "@postula/db";
 import Fastify, { type FastifyServerOptions } from "fastify";
 import {
   hasZodFastifySchemaValidationErrors,
@@ -31,7 +31,7 @@ declare module "fastify" {
 
 /**
  * The API: Zod validates every request and response and documents it in /openapi.json. Each
- * feature is a plugin in `routes/` that calls the use cases of @starter/core, like the web does.
+ * feature is a plugin in `routes/` that calls the use cases of @postula/core, like the web does.
  */
 export async function buildApp({
   db,
@@ -50,7 +50,7 @@ export async function buildApp({
   await app.register(cors, { origin: [appUrl] });
   await app.register(sensible);
   await app.register(swagger, {
-    openapi: { info: { title: "Starter API", version: "1.0.0" } },
+    openapi: { info: { title: "Postula API", version: "1.0.0" } },
     transform: jsonSchemaTransform,
   });
 

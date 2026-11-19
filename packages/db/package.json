@@ -1,5 +1,5 @@
 {
-  "name": "@starter/db",
+  "name": "@postula/db",
   "private": true,
   "type": "module",
   "exports": {
@@ -15,12 +15,12 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@starter/env": "workspace:*",
+    "@postula/env": "workspace:*",
     "drizzle-orm": "catalog:",
     "pg": "catalog:"
   },
   "devDependencies": {
-    "@starter/tsconfig": "workspace:*",
+    "@postula/tsconfig": "workspace:*",
     "@types/pg": "catalog:",
     "drizzle-kit": "catalog:"
   }

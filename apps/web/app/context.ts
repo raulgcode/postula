@@ -1,12 +1,12 @@
-import type { AuthSession } from "@starter/auth";
-import type { TenantContext } from "@starter/core";
-import { defaultLocale, type Locale } from "@starter/i18n";
+import type { AuthSession } from "@postula/auth";
+import type { TenantContext } from "@postula/core";
+import { defaultLocale, type Locale } from "@postula/i18n";
 import { createContext } from "react-router";
 
 /** Set by `requireSession` for every route under /app. */
 export const sessionContext = createContext<AuthSession>();
 
-/** Set by `requireTenant`: the workspace in the URL, ready to pass to @starter/core. */
+/** Set by `requireTenant`: the workspace in the URL, ready to pass to @postula/core. */
 export const tenantContext = createContext<TenantContext>();
 
 /** Set by `localeMiddleware` in root.tsx (and by `requireSession` from the account): the page's language. */

@@ -1,4 +1,4 @@
-import { getWorkspace } from "@starter/core";
+import { getWorkspace } from "@postula/core";
 import { Outlet } from "react-router";
 import { AppShell } from "~/components/app-shell";
 import { tenantContext } from "~/context";

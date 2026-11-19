@@ -1,6 +1,6 @@
-# Starter · guide for agents and people
+# Postula · guide for agents and people
 
-Starter comes from the `mono-template` template: a monorepo with the usual things already solved
+Postula comes from the `mono-template` template: a monorepo with the usual things already solved
 (sign-in with Google, password or an email link, multi-tenant workspaces, languages, light and
 dark theme, emails, security, tests and deployment). The project's own work is written on top,
 following these rules. If a rule doesn't apply, change it here first and then the code.
@@ -59,7 +59,7 @@ missing, run `pnpm install`. Don't add antipatterns the skill rules out.
 ### Forms: Conform + Zod, always
 
 Every form uses **Conform** (`@conform-to/react`, `@conform-to/zod/v4`) with a schema from
-`@starter/contracts`. The same schema validates in the browser (`onValidate` with
+`@postula/contracts`. The same schema validates in the browser (`onValidate` with
 `parseWithZod`) and in the `action` (`parseWithZod`); errors come back with
 `data({ result: submission.reply() }, { status: 400 })`. Inputs use `TextField` (it wires label,
 description and errors with `aria-*`). Schema errors are i18n keys
@@ -100,7 +100,7 @@ A change that adds or changes behavior without tests isn't finished.
 
 **Don't use Jest or jsdom.** Components are tested in a real browser with
 `vitest-browser-react`. Each integration test creates its own workspace with `createTestTenant`
-(`@starter/db/testing`); never share rows between tests or truncate tables.
+(`@postula/db/testing`); never share rows between tests or truncate tables.
 
 In Playwright (`apps/e2e/support/fixtures.ts`):
 - `ownerTest` starts with the worker's shared session (an owner with the "My company" workspace)
@@ -132,7 +132,7 @@ The `playwright-cli` skill opens the app and takes snapshots and traces.
 `apps/web/lighthouserc.json` defines the budget (score ≥ 0.95, FCP ≤ 2.2 s, LCP ≤ 2.5 s,
 JS ≤ 170 KB transferred per page, no third parties). If a change goes over, **optimize first**
 (code splitting, dropping dependencies, `zod/mini`, lazy loading). Only raise a limit with an
-explicit justification. `pnpm --filter @starter/web lighthouse` audits light, dark and Spanish.
+explicit justification. `pnpm --filter @postula/web lighthouse` audits light, dark and Spanish.
 
 ### Accessibility
 
@@ -149,7 +149,7 @@ with `TextField`, notices with `role="status"` or `role="alert"`.
 - The theme (`system`/`light`/`dark`) lives in a cookie that `root.tsx`'s `loader` reads; the
   server paints `data-theme` on `<html>`, so there is no flicker.
 - Everything that scrolls sideways goes inside `<ScrollShadow>`. Never a loose `overflow-x-auto`.
-- Emails (`@starter/email`): **always MJML**, never hand-written HTML or another library. Each
+- Emails (`@postula/email`): **always MJML**, never hand-written HTML or another library. Each
   template is MJML (`@faire/mjml-react`) inside `<EmailLayout>`, in the recipient's language.
 
 ### Languages: every feature ships in every language at once
@@ -264,5 +264,5 @@ pnpm typecheck && pnpm lint
 pnpm db:generate && pnpm db:migrate   # after changing the schema
 pnpm release [patch|minor|major|x.y.z]  # publishes main to production (tag → Fly.io)
 pnpm fly:secrets [--check]  # sends .env.production to Fly's secrets
-pnpm --filter @starter/web lighthouse
+pnpm --filter @postula/web lighthouse
 ```

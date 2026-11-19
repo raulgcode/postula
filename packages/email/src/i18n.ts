@@ -1,5 +1,5 @@
-import { createTranslator, defaultLocale, type Locale } from "@starter/i18n";
-import { dictionaries, type Messages } from "@starter/i18n/messages";
+import { createTranslator, defaultLocale, type Locale } from "@postula/i18n";
+import { dictionaries, type Messages } from "@postula/i18n/messages";
 
 /** Emails are written on the server, so they read the whole dictionary of the recipient's language. */
 export function emailT(locale: Locale = defaultLocale) {

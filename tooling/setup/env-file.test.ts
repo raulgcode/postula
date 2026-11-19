@@ -3,7 +3,7 @@ import { buildEnvFile, parseEnvKeys, setEnvValue } from "./env-file";
 
 const example = [
   "# Comentario",
-  "DATABASE_URL=postgres://localhost/starter",
+  "DATABASE_URL=postgres://localhost/postula",
   "",
   "BETTER_AUTH_SECRET=change-me-to-a-long-random-string",
   "SMTP_USER=",
@@ -15,7 +15,7 @@ describe("parseEnvKeys", () => {
   it("reads keys and values, ignoring comments and blank lines", () => {
     expect(parseEnvKeys(example)).toEqual(
       new Map([
-        ["DATABASE_URL", "postgres://localhost/starter"],
+        ["DATABASE_URL", "postgres://localhost/postula"],
         ["BETTER_AUTH_SECRET", "change-me-to-a-long-random-string"],
         ["SMTP_USER", ""],
       ]),
@@ -27,7 +27,7 @@ describe("buildEnvFile", () => {
   it("copies the example and fills secrets when there is no .env yet", () => {
     const result = buildEnvFile({ example, current: undefined, generators });
 
-    expect(result.content).toContain("DATABASE_URL=postgres://localhost/starter");
+    expect(result.content).toContain("DATABASE_URL=postgres://localhost/postula");
     expect(result.content).toContain("BETTER_AUTH_SECRET=generated-secret");
     expect(result.content).toContain("# Comentario");
     expect(result.added).toEqual(["DATABASE_URL", "BETTER_AUTH_SECRET", "SMTP_USER"]);

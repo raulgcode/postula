@@ -1,9 +1,9 @@
 import type { Translation } from "../../translate";
 import type { en } from "../en";
 
-/** The emails (`@starter/email`): each one goes in the recipient's language. */
+/** The emails (`@postula/email`): each one goes in the recipient's language. */
 export const email = {
-  footer: "Recibiste este correo porque alguien lo pidió con esta dirección en Starter.",
+  footer: "Recibiste este correo porque alguien lo pidió con esta dirección en Postula.",
   linkFallback: "¿No funciona el botón? Copia este enlace en tu navegador:",
   magicSubject: "Tu enlace para entrar",
   magicHeading: "Entra con un toque",

@@ -1,5 +1,5 @@
-import { createDatabase } from "@starter/db";
-import { getServerEnv } from "@starter/env";
+import { createDatabase } from "@postula/db";
+import { getServerEnv } from "@postula/env";
 import { buildApp } from "./app";
 import { scheduleRateLimitCleanup } from "./jobs/rate-limits";
 

@@ -1,4 +1,4 @@
-import { createTestDatabase } from "@starter/db/testing";
+import { createTestDatabase } from "@postula/db/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { type App, buildApp } from "./app";
 

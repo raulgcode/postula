@@ -5,7 +5,7 @@ import { renderEmail } from "../render";
 import { AccountEmail, accountEmailSubject } from "./account";
 import { MagicLinkEmail, magicLinkSubject } from "./magic-link";
 
-const url = "https://app.starter.example/api/auth/verify?token=abc&x=1";
+const url = "https://app.postula.intensoft.dev/api/auth/verify?token=abc&x=1";
 
 describe("brand in every email", () => {
   it.each([
@@ -18,7 +18,9 @@ describe("brand in every email", () => {
     expect(html).toContain("@media (prefers-color-scheme: dark)");
     expect(html).toContain('<meta name="color-scheme" content="light dark">');
     // The button and the link spelled out below it, with the & escaped in the HTML.
-    expect(html).toContain('href="https://app.starter.example/api/auth/verify?token=abc&amp;x=1"');
+    expect(html).toContain(
+      'href="https://app.postula.intensoft.dev/api/auth/verify?token=abc&amp;x=1"',
+    );
     expect(text).toContain(url);
   });
 });

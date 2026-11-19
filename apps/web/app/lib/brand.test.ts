@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { emailPalette } from "@starter/email/brand";
+import { emailPalette } from "@postula/email/brand";
 import { describe, expect, it } from "vitest";
 import { contrastRatio, themeBackground } from "./brand";
 

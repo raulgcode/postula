@@ -1,4 +1,4 @@
-import type { EmailEnv } from "@starter/env";
+import type { EmailEnv } from "@postula/env";
 import { createTransport, type Transporter } from "nodemailer";
 import type { ReactElement } from "react";
 import { renderEmail } from "./render";

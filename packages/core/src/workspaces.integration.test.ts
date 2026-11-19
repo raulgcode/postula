@@ -1,4 +1,4 @@
-import { createTestDatabase, createTestTenant } from "@starter/db/testing";
+import { createTestDatabase, createTestTenant } from "@postula/db/testing";
 import { afterAll, describe, expect, it } from "vitest";
 import { getWorkspace, listMemberships, resolveTenant } from "./workspaces";
 

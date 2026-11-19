@@ -54,7 +54,7 @@ export function TextField({
   );
 }
 
-/** The schema's errors, translated: `@starter/contracts` returns them as keys. */
+/** The schema's errors, translated: `@postula/contracts` returns them as keys. */
 export function FieldErrors({ id, errors }: { id: string; errors: string[] | undefined }) {
   const t = useT();
   if (!errors?.length) return null;

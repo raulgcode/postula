@@ -9,7 +9,7 @@ const production = {
   SMTP_USER: "resend",
   SMTP_PASSWORD: "re_123",
   SMTP_SECURE: "true",
-  EMAIL_FROM: "Starter <support@starter.example>",
+  EMAIL_FROM: "Postula <support@postula.intensoft.dev>",
 };
 
 describe("planSecrets", () => {
@@ -43,7 +43,7 @@ describe("planSecrets", () => {
     const plan = planSecrets(
       {
         ...production,
-        DATABASE_URL: "postgres://starter:starter@localhost:5432/starter",
+        DATABASE_URL: "postgres://postula:postula@localhost:5432/postula",
         SMTP_HOST: "localhost",
         SMTP_PORT: "1025",
         AUTH_RATE_LIMIT: "off",

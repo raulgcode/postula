@@ -1,6 +1,6 @@
-# The web on Fly.io (app.starter.example). Deployed by .github/workflows/deploy.yml after the
+# The web on Fly.io (app.postula.intensoft.dev). Deployed by .github/workflows/deploy.yml after the
 # API; by hand: `fly deploy --config fly.web.toml`. Secrets (same set as the API): docs/deploy.md.
-app = "starter-web"
+app = "postula-web"
 primary_region = "iad"
 kill_signal = "SIGTERM"
 kill_timeout = "30s"
@@ -11,8 +11,8 @@ kill_timeout = "30s"
 [env]
   NODE_ENV = "production"
   PORT = "3000"
-  APP_URL = "https://app.starter.example"
-  API_URL = "https://api.starter.example"
+  APP_URL = "https://app.postula.intensoft.dev"
+  API_URL = "https://api.postula.intensoft.dev"
   CLIENT_IP_HEADER = "fly-client-ip"
 
 [processes]

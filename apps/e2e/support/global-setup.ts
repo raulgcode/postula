@@ -1,5 +1,5 @@
-import { runMigrations } from "@starter/db/migrate";
-import { loadDotEnv } from "@starter/env";
+import { runMigrations } from "@postula/db/migrate";
+import { loadDotEnv } from "@postula/env";
 
 export default async function globalSetup() {
   loadDotEnv();

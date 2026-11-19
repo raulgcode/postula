@@ -1,9 +1,9 @@
 // Entry point for the Better Auth CLI (`pnpm auth:generate`), which reads `auth` to generate the
 // Drizzle schema in packages/db/src/schema/auth.ts. Every method is on, so the schema has all
 // their tables and columns whatever AUTH_METHODS says.
-import { createDatabase } from "@starter/db";
-import { createMailer } from "@starter/email";
-import { authMethods, getServerEnv } from "@starter/env";
+import { createDatabase } from "@postula/db";
+import { createMailer } from "@postula/email";
+import { authMethods, getServerEnv } from "@postula/env";
 import { createAuth } from "./auth";
 
 const env = getServerEnv();

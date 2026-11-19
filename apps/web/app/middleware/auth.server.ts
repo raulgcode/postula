@@ -1,4 +1,4 @@
-import { resolveTenant } from "@starter/core";
+import { resolveTenant } from "@postula/core";
 import { data, href, type MiddlewareFunction, redirect } from "react-router";
 import { sessionContext, tenantContext } from "~/context";
 import { applyAccountLocale } from "~/lib/locale.server";

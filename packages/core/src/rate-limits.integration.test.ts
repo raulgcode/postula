@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { eq, schema } from "@starter/db";
-import { createTestDatabase } from "@starter/db/testing";
+import { eq, schema } from "@postula/db";
+import { createTestDatabase } from "@postula/db/testing";
 import { afterAll, describe, expect, it } from "vitest";
 import { hitRateLimit, pruneRateLimits } from "./rate-limits";
 

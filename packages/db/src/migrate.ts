@@ -1,5 +1,5 @@
 import { fileURLToPath } from "node:url";
-import { databaseEnvSchema, loadDotEnv, parseEnv } from "@starter/env";
+import { databaseEnvSchema, loadDotEnv, parseEnv } from "@postula/env";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { createDatabase } from "./client";
 

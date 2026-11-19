@@ -16,7 +16,7 @@ RUN corepack install && pnpm fetch
 
 COPY . .
 RUN pnpm install --frozen-lockfile --offline \
-  && pnpm --filter @starter/web build
+  && pnpm --filter @postula/web build
 
 ENV NODE_ENV=production
 # Each app sets its own process in its fly.*.toml; this one is the web's, for `docker run`.

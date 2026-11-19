@@ -1,4 +1,4 @@
-import { getWorkspace } from "@starter/core";
+import { getWorkspace } from "@postula/core";
 import { PageHeader } from "~/components/page-header";
 import { sessionContext, tenantContext } from "~/context";
 import { metaT, useT } from "~/lib/i18n";

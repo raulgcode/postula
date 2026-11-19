@@ -2,7 +2,7 @@ import type { Translation } from "../../translate";
 import type { en } from "../en";
 
 export const home = {
-  title: "Starter",
+  title: "Postula",
   description: "Tu nuevo proyecto, listo para crecer.",
   heading: "Tu proyecto ya funciona",
   intro:

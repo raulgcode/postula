@@ -1,4 +1,4 @@
-import type { Key } from "@starter/i18n/messages";
+import type { Key } from "@postula/i18n/messages";
 
 /**
  * A validation error is a translation key, not a text: the same schema runs in the browser and

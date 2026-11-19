@@ -1,4 +1,4 @@
 {
-  "extends": "@starter/tsconfig/react.json",
+  "extends": "@postula/tsconfig/react.json",
   "include": ["src"]
 }

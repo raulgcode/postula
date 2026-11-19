@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { emailEnvSchema, parseEnv } from "@starter/env";
+import { emailEnvSchema, parseEnv } from "@postula/env";
 import { createElement } from "react";
 import { expect, it } from "vitest";
 import { createMailer } from "./mailer";
@@ -9,7 +9,7 @@ const mailpitUrl = process.env.MAILPIT_URL ?? "http://localhost:8025";
 
 it("delivers the magic link email through SMTP (Mailpit)", async () => {
   const mailer = createMailer(parseEnv(emailEnvSchema));
-  const to = `${randomUUID()}@test.starter.example`;
+  const to = `${randomUUID()}@test.postula.intensoft.dev`;
   const url = "http://localhost:5173/api/auth/magic-link/verify?token=abc";
 
   await mailer.send({ to, subject: "Sign in", react: createElement(MagicLinkEmail, { url }) });

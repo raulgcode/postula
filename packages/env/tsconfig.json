@@ -1,4 +1,4 @@
 {
-  "extends": "@starter/tsconfig/base.json",
+  "extends": "@postula/tsconfig/base.json",
   "include": ["src"]
 }

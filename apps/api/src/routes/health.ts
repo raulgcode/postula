@@ -1,4 +1,4 @@
-import { sql } from "@starter/db";
+import { sql } from "@postula/db";
 import type { FastifyPluginAsyncZod } from "fastify-type-provider-zod";
 import { z } from "zod";
 

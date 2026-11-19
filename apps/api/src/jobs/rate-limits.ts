@@ -1,5 +1,5 @@
-import { pruneRateLimits } from "@starter/core";
-import type { Database } from "@starter/db";
+import { pruneRateLimits } from "@postula/core";
+import type { Database } from "@postula/db";
 import type { FastifyBaseLogger } from "fastify";
 
 /** Every hour: forgets the rate-limit windows that ended long ago, so the table stays small. */

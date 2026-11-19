@@ -1,4 +1,4 @@
-import { databaseEnvSchema, loadDotEnv, parseEnv } from "@starter/env";
+import { databaseEnvSchema, loadDotEnv, parseEnv } from "@postula/env";
 import { defineConfig } from "drizzle-kit";
 
 loadDotEnv();

@@ -1,4 +1,4 @@
-import { asc, eq, inArray, schema, sql } from "@starter/db";
+import { asc, eq, inArray, schema, sql } from "@postula/db";
 import { data, Form, href, redirect } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";

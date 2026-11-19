@@ -1,7 +1,7 @@
-import { eq, schema } from "@starter/db";
-import { createTestDatabase, createTestTenant, createTestUser } from "@starter/db/testing";
-import type { SendEmailInput } from "@starter/email";
-import type { AuthMethod } from "@starter/env";
+import { eq, schema } from "@postula/db";
+import { createTestDatabase, createTestTenant, createTestUser } from "@postula/db/testing";
+import type { SendEmailInput } from "@postula/email";
+import type { AuthMethod } from "@postula/env";
 import { afterAll, describe, expect, it } from "vitest";
 import { createAuth } from "./auth";
 
@@ -23,7 +23,7 @@ function authWith(methods: AuthMethod[] = ["magic-link"], sent: SendEmailInput[]
   });
 }
 
-const uniqueEmail = () => `user-${crypto.randomUUID().slice(0, 8)}@test.starter.example`;
+const uniqueEmail = () => `user-${crypto.randomUUID().slice(0, 8)}@test.postula.intensoft.dev`;
 
 describe("Google", () => {
   it("sends to Google with our callback and keeps the state", async () => {
@@ -212,7 +212,7 @@ describe("member and workspace endpoints don't exist over HTTP", () => {
         new Request(`${baseURL}/api/auth/organization/${path}`, {
           method: "POST",
           headers: { "content-type": "application/json", origin: baseURL },
-          body: JSON.stringify({ email: "x@test.starter.example", role: "owner", name: "x" }),
+          body: JSON.stringify({ email: "x@test.postula.intensoft.dev", role: "owner", name: "x" }),
         }),
       );
 

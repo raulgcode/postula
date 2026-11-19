@@ -1,6 +1,6 @@
 import { getFormProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { forgotPasswordSchema } from "@starter/contracts";
+import { forgotPasswordSchema } from "@postula/contracts";
 import { data, Form, href, Link, useNavigation } from "react-router";
 import { StandalonePage } from "~/components/standalone-page";
 import { TextField } from "~/components/text-field";

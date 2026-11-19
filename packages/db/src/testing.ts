@@ -46,7 +46,7 @@ export async function createTestTenant(
 export async function createTestUser(db: Database, suffix = randomUUID().slice(0, 8)) {
   const [user] = await db
     .insert(schema.user)
-    .values({ name: `Owner ${suffix}`, email: `owner-${suffix}@test.starter.example` })
+    .values({ name: `Owner ${suffix}`, email: `owner-${suffix}@test.postula.intensoft.dev` })
     .returning({ id: schema.user.id });
   if (!user) throw new Error("Failed to create test user");
   return user.id;

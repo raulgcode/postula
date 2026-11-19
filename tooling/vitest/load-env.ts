@@ -1,3 +1,3 @@
-import { loadDotEnv } from "@starter/env";
+import { loadDotEnv } from "@postula/env";
 
 loadDotEnv();

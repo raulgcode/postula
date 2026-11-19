@@ -1,5 +1,5 @@
 {
-  "name": "@starter/api",
+  "name": "@postula/api",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,17 +12,17 @@
     "@fastify/helmet": "catalog:",
     "@fastify/sensible": "catalog:",
     "@fastify/swagger": "catalog:",
-    "@starter/contracts": "workspace:*",
-    "@starter/core": "workspace:*",
-    "@starter/db": "workspace:*",
-    "@starter/email": "workspace:*",
-    "@starter/env": "workspace:*",
+    "@postula/contracts": "workspace:*",
+    "@postula/core": "workspace:*",
+    "@postula/db": "workspace:*",
+    "@postula/email": "workspace:*",
+    "@postula/env": "workspace:*",
     "fastify": "catalog:",
     "fastify-type-provider-zod": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@starter/tsconfig": "workspace:*",
+    "@postula/tsconfig": "workspace:*",
     "pino-pretty": "catalog:",
     "tsx": "catalog:"
   }

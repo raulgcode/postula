@@ -1,7 +1,7 @@
 import { getFormProps, useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { createWorkspaceSchema } from "@starter/contracts";
-import { uniqueSlug } from "@starter/core";
+import { createWorkspaceSchema } from "@postula/contracts";
+import { uniqueSlug } from "@postula/core";
 import { data, Form, href, redirect, useNavigation } from "react-router";
 import { StandalonePage } from "~/components/standalone-page";
 import { TextField } from "~/components/text-field";

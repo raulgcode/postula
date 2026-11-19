@@ -8,7 +8,7 @@ import {
   expect,
   type Page,
 } from "@playwright/test";
-import type { Database } from "@starter/db";
+import type { Database } from "@postula/db";
 import { connectTestDatabase, findWorkspace, slugOf, type Workspace } from "./database";
 import { getLinkFromEmail, uniqueEmail } from "./mailpit";
 
@@ -32,7 +32,7 @@ interface Fixtures {
 }
 
 interface WorkerFixtures {
-  /** The e2e database, one connection per worker: seed data with `@starter/core`, not SQL. */
+  /** The e2e database, one connection per worker: seed data with `@postula/core`, not SQL. */
   db: Database;
   /**
    * Session of an owner with a workspace ("My company"), created once per worker through the

@@ -1,4 +1,4 @@
-import { and, asc, type Database, eq, schema } from "@starter/db";
+import { and, asc, type Database, eq, schema } from "@postula/db";
 import { NotFoundError } from "./errors";
 import type { TenantContext } from "./tenant";
 

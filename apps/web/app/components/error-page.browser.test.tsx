@@ -1,4 +1,4 @@
-import type { Locale } from "@starter/i18n";
+import type { Locale } from "@postula/i18n";
 import { createRoutesStub } from "react-router";
 import { describe, expect, it } from "vitest";
 import { render } from "vitest-browser-react";

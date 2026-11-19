@@ -1,4 +1,4 @@
-import type { Database } from "@starter/db";
+import type { Database } from "@postula/db";
 
 /**
  * Every use case receives the tenant explicitly. Queries must filter by

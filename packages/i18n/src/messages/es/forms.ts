@@ -2,7 +2,7 @@ import type { Translation } from "../../translate";
 import type { en } from "../en";
 
 /**
- * Shared by the forms, including the validation errors: the schemas in `@starter/contracts`
+ * Shared by the forms, including the validation errors: the schemas in `@postula/contracts`
  * return these keys and `FieldErrors` translates them.
  */
 export const forms = {

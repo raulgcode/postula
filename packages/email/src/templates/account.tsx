@@ -1,4 +1,4 @@
-import { defaultLocale, type Locale } from "@starter/i18n";
+import { defaultLocale, type Locale } from "@postula/i18n";
 import { emailT } from "../i18n";
 import {
   type EmailBaseProps,

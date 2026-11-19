@@ -1,13 +1,13 @@
-import { and, asc, type Database, desc, eq, isNotNull, schema, sql } from "@starter/db";
+import { and, asc, type Database, desc, eq, isNotNull, schema, sql } from "@postula/db";
 import {
   AccountEmail,
   accountEmailSubject,
   MagicLinkEmail,
   type Mailer,
   magicLinkSubject,
-} from "@starter/email";
-import type { AuthMethod } from "@starter/env";
-import { defaultLocale, parseLocale } from "@starter/i18n";
+} from "@postula/email";
+import type { AuthMethod } from "@postula/env";
+import { defaultLocale, parseLocale } from "@postula/i18n";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { magicLink, organization } from "better-auth/plugins";
@@ -49,7 +49,7 @@ export type RateLimitStorage = NonNullable<
 >;
 
 /**
- * Members and invitations go through @starter/core (with its own checks), so Better Auth's own
+ * Members and invitations go through @postula/core (with its own checks), so Better Auth's own
  * endpoints for them are off over HTTP: without this, any member could invite, promote or remove
  * people by calling them directly. The server keeps using `auth.api` after its own checks.
  */
@@ -88,7 +88,7 @@ export interface CreateAuthOptions {
   /** Better Auth's per-IP rate limit. Defaults to on; the e2e server disables it. */
   rateLimit?: boolean;
   /**
-   * Where the rate limit counts, shared by every server (`hitRateLimit` of @starter/core);
+   * Where the rate limit counts, shared by every server (`hitRateLimit` of @postula/core);
    * in memory without it, which only holds on a single machine.
    */
   rateLimitStorage?: RateLimitStorage;
@@ -130,7 +130,7 @@ export function createAuth({
   };
 
   return betterAuth({
-    appName: "Starter",
+    appName: "Postula",
     baseURL,
     secret,
     trustedOrigins: [baseURL, ...trustedOrigins],

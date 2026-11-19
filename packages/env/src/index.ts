@@ -168,5 +168,5 @@ export function getServerEnv(): ServerEnv {
  * with HKDF: a key leaked from one use tells nothing about the others.
  */
 export function deriveSecret(secret: string, purpose: string): string {
-  return Buffer.from(hkdfSync("sha256", secret, "starter", purpose, 32)).toString("base64url");
+  return Buffer.from(hkdfSync("sha256", secret, "postula", purpose, 32)).toString("base64url");
 }

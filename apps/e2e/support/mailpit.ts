@@ -58,5 +58,5 @@ export async function getLinkFromEmail(
 }
 
 export function uniqueEmail(prefix: string): string {
-  return `${prefix}-${crypto.randomUUID().slice(0, 8)}@e2e.starter.test`;
+  return `${prefix}-${crypto.randomUUID().slice(0, 8)}@e2e.postula.test`;
 }

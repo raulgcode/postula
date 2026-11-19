@@ -63,7 +63,7 @@ export function planSecrets(
     problems.push("SMTP_* is the local Mailpit: use the production mail server");
   }
   if (!secrets.EMAIL_FROM)
-    problems.push("EMAIL_FROM is missing (e.g. Starter <support@starter.example>)");
+    problems.push("EMAIL_FROM is missing (e.g. Postula <support@postula.intensoft.dev>)");
 
   if (secrets.AUTH_RATE_LIMIT === "off") {
     problems.push("AUTH_RATE_LIMIT=off is only for the e2e tests: remove it");

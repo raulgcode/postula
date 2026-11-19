@@ -1,7 +1,7 @@
-# The API on Fly.io (api.starter.example) and its scheduled jobs. Deployed first by
+# The API on Fly.io (api.postula.intensoft.dev) and its scheduled jobs. Deployed first by
 # .github/workflows/deploy.yml; by hand: `fly deploy --config fly.api.toml`. Secrets (same set as
 # the web): docs/deploy.md.
-app = "starter-api"
+app = "postula-api"
 primary_region = "iad"
 kill_signal = "SIGTERM"
 kill_timeout = "30s"
@@ -17,8 +17,8 @@ kill_timeout = "30s"
 [env]
   NODE_ENV = "production"
   PORT = "3001"
-  APP_URL = "https://app.starter.example"
-  API_URL = "https://api.starter.example"
+  APP_URL = "https://app.postula.intensoft.dev"
+  API_URL = "https://api.postula.intensoft.dev"
   CLIENT_IP_HEADER = "fly-client-ip"
 
 [processes]
