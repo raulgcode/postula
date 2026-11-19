@@ -21,9 +21,11 @@ kill_timeout = "30s"
 [http_service]
   internal_port = 3000
   force_https = true
+  # Stops when idle and wakes on the next visit (a couple of seconds): Postula is one person's
+  # tool for now, so an always-on machine would cost for nothing.
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 1
+  min_machines_running = 0
   processes = ["app"]
 
   [http_service.concurrency]

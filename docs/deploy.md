@@ -2,11 +2,14 @@
 
 Postula runs on Fly.io as two apps built from the same image (`Dockerfile`), plus the database:
 
-| What                 | Where                                                      | Config         |
-| -------------------- | ---------------------------------------------------------- | -------------- |
-| `postula-web`        | `app.postula.intensoft.dev`: pages, sign-in, the workspace | `fly.web.toml` |
-| `postula-api`        | `api.postula.intensoft.dev`: public API and scheduled jobs | `fly.api.toml` |
-| Fly Managed Postgres | `postula-db`, same region as the apps (`iad`)              | —              |
+| What          | Where                                                                              | Config         |
+| ------------- | ---------------------------------------------------------------------------------- | -------------- |
+| `postula-web` | `app.postula.intensoft.dev`: pages, sign-in, the panel                             | `fly.web.toml` |
+| `postula-api` | `api.postula.intensoft.dev`: REST, MCP, webhooks (`app`) and the worker (`worker`) | `fly.api.toml` |
+| Postgres      | `DATABASE_URL`, same region as the apps (`iad`)                                    | —              |
+
+The API and the web stop when idle and wake on the next request. The worker runs only while
+someone has **Búsqueda activa** on (see "The worker" below).
 
 The public URLs (`APP_URL`, `API_URL`) and `CLIENT_IP_HEADER` are in `[env]` of each
 `fly.*.toml`; everything else is a secret, the same in both apps.
@@ -27,13 +30,10 @@ If a name is taken, pick another and change it in `app = "…"` of the `fly.*.to
 
 ### 2. Database
 
-```bash
-fly mpg create --name postula-db --region iad --plan basic
-```
-
-In the Fly dashboard → Managed Postgres → `postula-db` → Connection, copy the **direct** URL
-(`…@direct.<id>.flympg.net/…`). If `iad` isn't available, use another nearby region
-(`fly platform regions`) and set the same one in `primary_region` of both `fly.*.toml`.
+Any Postgres 16+ reachable from `iad` works; the plan weighs Neon's free plan against an
+unmanaged Postgres machine on Fly (cheapest, backed up with a daily `pg_dump`). The choice is
+still open: this step gets its exact commands when it's made. Either way, `DATABASE_URL` is a
+direct URL (not a transaction pooler: pg-boss needs session features).
 
 ### 3. Secrets
 
@@ -133,5 +133,28 @@ fly secrets deploy -a postula-api           # applies secrets without waiting fo
 - **Roll back**: `fly deploy --config fly.web.toml --image
   registry.fly.io/postula-web:v1.4.2` (same for the API). Migrations aren't undone: each
   migration must be compatible with the previous version.
-- **More machines**: the web scales with `fly scale count 2 -a postula-web`. The API stays at one:
-  the scheduled jobs run in its process.
+- **More machines**: the web scales with `fly scale count 2 -a postula-web`. Keep one `worker`
+  machine: the switch starts and stops the ones it finds, and pg-boss shares the queue anyway.
+
+## The worker and "Búsqueda activa"
+
+The `worker` process group of `postula-api` runs the queue (pg-boss, schema `pgboss` of the same
+Postgres): searches, matching, documents, sending and the crons. It costs only while it runs:
+
+- The panel's switch (and the AI's `encender_busqueda`) starts its machine through the Machines
+  API with `FLY_API_TOKEN`; `apagar_busqueda` stops it when nobody else has it on.
+- The worker checks every minute whether anyone still has the search on; when nobody does it
+  exits with 0, and `[[restart]] policy = "on-failure"` leaves it stopped. A deploy starts it and
+  it stops again the same way.
+- Jobs sent while it's off wait in the queue; a cron that came due while it was off runs once
+  when it starts (`missed: "once"`).
+
+The token, once (as a secret of both apps, so the web and the API can flip the switch):
+
+```bash
+fly tokens create deploy -a postula-api -x 8760h   # copy the whole "FlyV1 …" line
+```
+
+and put it in `.env.production` as `FLY_API_TOKEN=FlyV1 …` before `pnpm fly:secrets`. The first
+deploy creates one `app` and one `worker` machine; if Fly made two of a group, `fly scale count
+app=1 worker=1 -a postula-api`.
