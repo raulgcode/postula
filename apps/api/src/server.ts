@@ -1,3 +1,4 @@
+import { createJobBoardReader } from "@postula/boards";
 import { createDatabase } from "@postula/db";
 import { getServerEnv } from "@postula/env";
 import { workerMachinesFromEnv } from "@postula/fly";
@@ -11,7 +12,7 @@ const app = await buildApp({
   db: connection.db,
   appUrl: env.APP_URL,
   apiUrl: env.API_URL,
-  services: { machines: workerMachinesFromEnv(env) },
+  services: { machines: workerMachinesFromEnv(env), boards: createJobBoardReader() },
   clientIpHeader: env.CLIENT_IP_HEADER,
   logger: env.NODE_ENV === "development" ? { transport: { target: "pino-pretty" } } : true,
 });

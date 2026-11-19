@@ -4,6 +4,7 @@ export {
   hashOAuthToken,
 } from "./ai-connections";
 export { listAudit } from "./audit";
+export type { BoardRead, JobBoardReader } from "./boards";
 export { DomainError, InvalidProfileError, NotFoundError } from "./errors";
 export {
   addSearchCompany,
@@ -45,6 +46,8 @@ export {
   apagarBusqueda,
   borrarBusqueda,
   borrarItemPerfil,
+  correrBusqueda,
+  correrBusquedaProgramada,
   crearBusqueda,
   editarBusqueda,
   editarPerfil,
@@ -59,6 +62,9 @@ export {
   searchSwitchOperation,
   verAuditoria,
   verBusqueda,
+  verCorridas,
+  verOferta,
+  verOfertas,
   verPerfil,
 } from "./registry";
 export {
@@ -68,5 +74,14 @@ export {
   setSearchActive,
   workerStateOf,
 } from "./search";
+export {
+  type DueSearch,
+  dueSearches,
+  getPosting,
+  listPostings,
+  listSearchRuns,
+  localDayAndTime,
+  runSearch,
+} from "./search-runs";
 export { createSecretBox, type SecretBox } from "./secret-box";
 export type { TenantContext } from "./tenant";

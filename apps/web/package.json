@@ -17,6 +17,7 @@
     "@react-router/node": "catalog:",
     "@react-router/serve": "catalog:",
     "@postula/auth": "workspace:*",
+    "@postula/boards": "workspace:*",
     "@postula/contracts": "workspace:*",
     "@postula/core": "workspace:*",
     "@postula/fly": "workspace:*",

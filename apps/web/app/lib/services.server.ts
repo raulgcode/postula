@@ -1,4 +1,5 @@
 import { createAuth, type RateLimitStorage } from "@postula/auth";
+import { createJobBoardReader } from "@postula/boards";
 import { mcpUrl } from "@postula/contracts";
 import { type CoreServices, hashOAuthToken, hitRateLimit } from "@postula/core";
 import { createDatabase } from "@postula/db";
@@ -56,5 +57,11 @@ export const auth = singleton("__postulaAuth", () =>
 /** How people sign in here (AUTH_METHODS), for /login and the pages that depend on it. */
 export const authMethods = env.AUTH_METHODS;
 
-/** What core's operations reach besides the database: the worker's machines for the switch. */
-export const coreServices: CoreServices = { machines: workerMachinesFromEnv(env) };
+/**
+ * What core's operations reach besides the database: the worker's machines for the switch and
+ * the companies' job boards for "Search now".
+ */
+export const coreServices: CoreServices = {
+  machines: workerMachinesFromEnv(env),
+  boards: createJobBoardReader(),
+};

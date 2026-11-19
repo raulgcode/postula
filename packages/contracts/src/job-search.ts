@@ -191,7 +191,7 @@ export interface SearchCompany {
   token: string;
   company: string;
   /** Whether the board answered the last time Postula checked it (`unchecked` until then). */
-  status: "unchecked" | "ok" | "not_found";
+  status: "unchecked" | "ok" | "not_found" | "error";
   checkedAt: string | null;
 }
 

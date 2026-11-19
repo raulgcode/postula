@@ -24,6 +24,7 @@ letter without inventing anything, and applies once they approve. Each person is
 | `packages/email`     | Nodemailer + MJML: branded emails, in light and dark                |
 | `packages/i18n`      | Languages (en, es): typed dictionaries, `t()`, language choice      |
 | `packages/env`       | Environment variable validation with Zod                            |
+| `packages/boards`    | Public job boards (Greenhouse, Lever, Ashby): read and normalize    |
 | `packages/fly`       | Fly Machines API: starts and stops the worker for "Búsqueda activa" |
 | `tooling/*`          | Repo scripts: setup, release, Fly secrets, remote e2e               |
 
@@ -261,6 +262,19 @@ regions, a year's salary, excluded companies), an hour and time zone, a mode (`m
 set aside. A search looks in companies' public job boards (Greenhouse, Lever, Ashby, by the board
 name in their address), never LinkedIn; without `companies`, `crear_busqueda` starts with
 `suggestedCompanies`. The panel's form uses `searchFormSchema` (an unchecked "runs" box is off).
+
+### Postings and the daily run
+
+`runSearch` (`core/src/search-runs.ts`) reads every board of a search through a
+`JobBoardReader` (`services.boards`): `@postula/boards` calls only each ATS's public, documented
+listing (Greenhouse Job Board API, Lever Postings API, Ashby Job Posting API) and turns it into a
+`BoardPosting`; tests and e2e pass a fake one. `job_posting` is unique per person, board, board
+name and posting id, so a posting is never saved twice; one that leaves its board gets
+`closedAt`; the same job on two boards (`postingFingerprint`) points to the first with
+`duplicateOfId` and is listed once. Each run is a `search_run` (`ver_corridas`); the daily one
+carries the day in the search's time zone, unique per search. The worker's `dispatch-searches`
+(every 5 min) queues `run-search` for the searches whose hour came, of people with the search
+on (`dueSearches`). "Search now" (`correr_busqueda`) runs in the request.
 
 ### The worker and "Búsqueda activa"
 

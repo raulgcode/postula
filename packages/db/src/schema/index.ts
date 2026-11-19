@@ -1,5 +1,6 @@
 export * from "./audit";
 export * from "./auth";
+export * from "./job-posting";
 export * from "./job-search";
 export * from "./profile";
 export * from "./search";

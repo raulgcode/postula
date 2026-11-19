@@ -242,6 +242,9 @@ importers:
       '@modelcontextprotocol/server':
         specifier: 'catalog:'
         version: 2.4.0
+      '@postula/boards':
+        specifier: workspace:*
+        version: link:../../packages/boards
       '@postula/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -324,6 +327,9 @@ importers:
       '@postula/auth':
         specifier: workspace:*
         version: link:../../packages/auth
+      '@postula/boards':
+        specifier: workspace:*
+        version: link:../../packages/boards
       '@postula/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -452,6 +458,19 @@ importers:
       auth:
         specifier: 'catalog:'
         version: 1.7.26(@better-fetch/fetch@1.3.3)(@opentelemetry/api@1.10.0)(better-call@1.4.6(zod@4.6.7))(drizzle-kit@0.31.11)(drizzle-orm@0.45.4(@opentelemetry/api@1.10.0)(@types/pg@8.23.1)(kysely@0.29.7)(pg@8.23.1))(jose@6.2.13)(kysely@0.29.7)(magicast@0.5.5)(nanostores@1.5.5)(pg@8.23.1)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vitest@5.0.5)
+
+  packages/boards:
+    dependencies:
+      '@postula/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@postula/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@postula/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
 
   packages/contracts:
     dependencies:

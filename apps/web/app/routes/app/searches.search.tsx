@@ -5,27 +5,31 @@ import {
   boardUrl,
   jobBoards,
   type SearchCompany,
+  type SearchRun,
   updateSearchFormSchema,
 } from "@postula/contracts";
 import {
   agregarEmpresa,
   borrarBusqueda,
+  correrBusqueda,
   DomainError,
   editarBusqueda,
   quitarEmpresa,
   runOperation,
   verBusqueda,
+  verCorridas,
+  verOfertas,
 } from "@postula/core";
-import { ExternalLinkIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
+import { ExternalLinkIcon, ListIcon, PlusIcon, SearchIcon, Trash2Icon, XIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { data, Form, href, redirect, useFetcher, useNavigation } from "react-router";
+import { data, Form, href, Link, redirect, useFetcher, useNavigation } from "react-router";
 import { PageHeader } from "~/components/page-header";
 import { SearchForm } from "~/components/search-form";
 import { FieldErrors, TextField } from "~/components/text-field";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { tenantContext } from "~/context";
-import { metaT, useT } from "~/lib/i18n";
+import { metaT, useLocale, useT } from "~/lib/i18n";
 import { translations } from "~/lib/locale.server";
 import { searchFormDefaults } from "~/lib/searches";
 import { coreServices } from "~/lib/services.server";
@@ -39,8 +43,18 @@ const ctxOf = (context: Route.LoaderArgs["context"]) => ({
 
 export async function loader({ params, context }: Route.LoaderArgs) {
   try {
-    const search = await runOperation(verBusqueda, ctxOf(context), { id: params.searchId });
-    return { search, i18n: translations(context, "searches", "forms") };
+    const ctx = ctxOf(context);
+    const search = await runOperation(verBusqueda, ctx, { id: params.searchId });
+    const [runs, open] = await Promise.all([
+      runOperation(verCorridas, ctx, { id: search.id }),
+      runOperation(verOfertas, ctx, { searchId: search.id, limit: 1 }),
+    ]);
+    return {
+      search,
+      lastRun: runs[0] ?? null,
+      openPostings: open.total,
+      i18n: translations(context, "searches", "forms"),
+    };
   } catch (error) {
     if (error instanceof DomainError && error.code === "not_found") {
       throw data("Search not found", { status: 404 });
@@ -61,6 +75,17 @@ export async function action({ request, params, context }: Route.ActionArgs) {
   if (intent === "delete") {
     await runOperation(borrarBusqueda, ctx, { id: params.searchId });
     throw redirect(href("/app/searches"));
+  }
+  if (intent === "run") {
+    try {
+      await runOperation(correrBusqueda, ctx, { id: params.searchId });
+    } catch (error) {
+      if (error instanceof DomainError && error.code === "search_running") {
+        return { intent, result: undefined, busy: true };
+      }
+      throw error;
+    }
+    return { intent, result: undefined };
   }
   if (intent === "remove-company") {
     await runOperation(quitarEmpresa, ctx, {
@@ -88,7 +113,7 @@ export async function action({ request, params, context }: Route.ActionArgs) {
 export default function SearchPage({ loaderData, actionData }: Route.ComponentProps) {
   const t = useT();
   const navigation = useNavigation();
-  const { search } = loaderData;
+  const { search, lastRun, openPostings } = loaderData;
   const settingsResult = actionData?.intent === "settings" ? actionData.result : undefined;
   const saved = settingsResult?.status === "success" && navigation.state === "idle";
 
@@ -96,6 +121,13 @@ export default function SearchPage({ loaderData, actionData }: Route.ComponentPr
     <>
       <PageHeader title={search.name} description={t("searches.intro")} />
       <div className="grid gap-6">
+        <Postings
+          searchId={search.id}
+          runAt={search.runAt}
+          lastRun={lastRun}
+          openPostings={openPostings}
+          busy={actionData?.intent === "run" && "busy" in actionData}
+        />
         <SearchForm
           key={search.updatedAt}
           id={`search-${search.id}`}
@@ -149,7 +181,93 @@ const statusLabels = {
   unchecked: "searches.statusUnchecked",
   ok: "searches.statusOk",
   not_found: "searches.statusNotFound",
+  error: "searches.statusError",
 } as const;
+
+function Postings({
+  searchId,
+  runAt,
+  lastRun,
+  openPostings,
+  busy,
+}: {
+  searchId: string;
+  runAt: string;
+  lastRun: SearchRun | null;
+  openPostings: number;
+  busy: boolean;
+}) {
+  const t = useT();
+  const locale = useLocale();
+  const navigation = useNavigation();
+  const running = navigation.state === "submitting" && navigation.formData?.get("intent") === "run";
+  const failed = lastRun?.errors.map((error) => error.company) ?? [];
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <h2>{t("searches.runTitle")}</h2>
+        </CardTitle>
+        <CardDescription>
+          {lastRun
+            ? t("searches.lastRun", {
+                date: new Intl.DateTimeFormat(locale, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                }).format(new Date(lastRun.startedAt)),
+              })
+            : t("searches.neverRan", { time: runAt })}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        <div role="status" className="grid gap-1 text-sm">
+          {running ? <p className="font-medium">{t("searches.runningNow")}</p> : null}
+          {!running && busy ? <p className="font-medium">{t("searches.runBusy")}</p> : null}
+          {!running && lastRun && lastRun.status !== "failed" ? (
+            <p>
+              {t("searches.runResult", {
+                found: lastRun.found,
+                added: lastRun.added,
+                closed: lastRun.closed,
+              })}
+            </p>
+          ) : null}
+          {!running && lastRun?.status === "partial" ? (
+            <p className="text-muted-foreground">
+              {t("searches.runPartial", {
+                companies: new Intl.ListFormat(locale).format(failed),
+              })}
+            </p>
+          ) : null}
+          {!running && lastRun?.status === "failed" ? <p>{t("searches.runFailed")}</p> : null}
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Form method="post">
+            <Button
+              type="submit"
+              name="intent"
+              value="run"
+              size="lg"
+              className="w-full sm:w-auto"
+              disabled={running}
+            >
+              <SearchIcon aria-hidden />
+              {t("searches.runNow")}
+            </Button>
+          </Form>
+          {openPostings > 0 ? (
+            <Button asChild variant="outline" size="lg">
+              <Link to={href("/app/searches/:searchId/postings", { searchId })}>
+                <ListIcon aria-hidden />
+                {t("searches.seePostings", { count: openPostings })}
+              </Link>
+            </Button>
+          ) : null}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 function Companies({ searchId, companies }: { searchId: string; companies: SearchCompany[] }) {
   const t = useT();

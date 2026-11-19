@@ -1,5 +1,58 @@
+import type { BoardPosting } from "@postula/contracts";
+import {
+  correrBusqueda,
+  crearBusqueda,
+  type JobBoardReader,
+  localWorkerMachines,
+  runOperation,
+  type TenantContext,
+} from "@postula/core";
 import { expect, test } from "../support/fixtures";
 import { openSection } from "../support/navigation";
+
+const posting = (externalId: string, overrides: Partial<BoardPosting>): BoardPosting => ({
+  externalId,
+  title: "Frontend Engineer",
+  company: "Acme",
+  location: "Remote - Americas",
+  workplace: "remote",
+  url: `https://job-boards.greenhouse.io/acme/jobs/${externalId}`,
+  applyUrl: null,
+  description: "Build accessible React apps.",
+  publishedAt: "2026-11-10T14:00:00.000Z",
+  salary: null,
+  department: null,
+  employmentType: null,
+  ...overrides,
+});
+
+/** Two boards that list the same job, as the real ones would answer, without the network. */
+const boards: JobBoardReader = {
+  async read(_board, token) {
+    if (token === "acme") {
+      return {
+        status: "ok",
+        postings: [
+          posting("1", {
+            title: "Senior Frontend Engineer",
+            salary: { min: 60000, max: 80000, currency: "USD", interval: "year" },
+          }),
+          posting("2", { title: "Design Engineer", workplace: "hybrid", location: "Austin" }),
+        ],
+      };
+    }
+    if (token === "acme-jobs") {
+      return { status: "ok", postings: [posting("90", { title: "Senior Frontend Engineer" })] };
+    }
+    return { status: "not_found" };
+  },
+};
+
+const prepare = (tenant: TenantContext) => ({
+  tenant,
+  services: { machines: localWorkerMachines, boards },
+  via: "web" as const,
+});
 
 // Each scenario signs in with an account of its own: searches are the person's, and these
 // change them.
@@ -136,6 +189,53 @@ test.describe("Feature: searches", () => {
       await page.reload();
       await expect(page.getByRole("button", { name: "Take Binance out" })).toHaveCount(0);
       await expect(companies.getByRole("listitem")).toHaveCount(27);
+    });
+  });
+
+  test("Scenario: after a search ran, they see each job once with its pay, and which board failed", async ({
+    page,
+    signIn,
+    accountOf,
+    expectAccessible,
+  }) => {
+    await test.step("Given a search that read two boards with the same job and one that doesn't exist", async () => {
+      const { tenant } = await accountOf(await signIn(page));
+      const search = await runOperation(crearBusqueda, prepare(tenant), {
+        name: "Frontend",
+        companies: [
+          { board: "greenhouse", token: "acme", company: "Acme" },
+          { board: "lever", token: "acme-jobs", company: "Acme (Lever)" },
+          { board: "ashby", token: "gone", company: "Gone" },
+        ],
+      });
+      await runOperation(correrBusqueda, prepare(tenant), { id: search.id });
+      await page.goto(`/app/searches/${search.id}`);
+    });
+
+    await test.step("Then the search says what it found and which board it couldn't read", async () => {
+      await expect(
+        page.getByText("The boards list 3 postings: 3 new, 0 closed since the time before."),
+      ).toBeVisible();
+      await expect(page.getByText("Couldn't read: Gone.")).toBeVisible();
+    });
+
+    await test.step("When they open the postings", async () => {
+      await page.getByRole("link", { name: "See the 2 postings" }).click();
+    });
+
+    await test.step("Then the job on both boards shows once, with its pay", async () => {
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Postings of Frontend" }),
+      ).toBeVisible();
+      const postings = page.getByRole("list", { name: "Postings" }).getByRole("listitem");
+      await expect(postings).toHaveCount(2);
+      await expect(postings.filter({ hasText: "Senior Frontend Engineer" })).toContainText(
+        "Remote - Americas · Remote · 60,000–80,000 USD a year",
+      );
+      await expect(postings.filter({ hasText: "Design Engineer" })).toContainText(
+        "Austin · Hybrid",
+      );
+      await expectAccessible(page);
     });
   });
 

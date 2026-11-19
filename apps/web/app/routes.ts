@@ -32,6 +32,7 @@ export default [
       route("searches", "routes/app/searches.tsx"),
       route("searches/new", "routes/app/searches.new.tsx"),
       route("searches/:searchId", "routes/app/searches.search.tsx"),
+      route("searches/:searchId/postings", "routes/app/searches.postings.tsx"),
       route("settings", "routes/app/settings.tsx"),
     ]),
   ]),

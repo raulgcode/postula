@@ -1,0 +1,18 @@
+{
+  "name": "@postula/boards",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@postula/contracts": "workspace:*",
+    "@postula/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@postula/tsconfig": "workspace:*"
+  }
+}

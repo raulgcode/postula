@@ -4,9 +4,12 @@ import {
   deleteProfileItemSchema,
   importProfileSchema,
   listAuditSchema,
+  listPostingsSchema,
   moveProfileItemSchema,
+  postingIdSchema,
   profileHeaderSchema,
   removeSearchCompanySchema,
+  runSearchSchema,
   saveProfileItemSchema,
   searchIdSchema,
   type setSearchSchema,
@@ -33,6 +36,7 @@ import {
   saveProfileItem,
 } from "./profile";
 import { getSearchStatus, setSearchActive } from "./search";
+import { getPosting, listPostings, listSearchRuns, runSearch } from "./search-runs";
 
 const noInput = z.object({});
 
@@ -249,6 +253,66 @@ export const quitarEmpresa = defineOperation({
   run: ({ tenant }, input) => removeSearchCompany(tenant, input),
 });
 
+export const correrBusqueda = defineOperation({
+  name: "correr_busqueda",
+  title: "Search now",
+  description:
+    "Reads every company's public job board of a search now, instead of waiting for its daily hour, and saves the new postings. It answers how many it found, how many are new and which boards failed. Each search runs once at a time.",
+  input: runSearchSchema,
+  access: "write",
+  destructive: false,
+  idempotent: false,
+  run: ({ tenant, services, via }, input) => runSearch(tenant, services, input.id, { via }),
+});
+
+/** The worker's daily run: not an AI tool (the AI has `correr_busqueda`). */
+export const correrBusquedaProgramada = defineOperation({
+  name: "correr_busqueda_programada",
+  title: "Daily search run",
+  description: "The worker runs a search at its hour, once a day.",
+  input: z.object({ id: z.uuid(), scheduledFor: z.string().check(z.regex(/^\d{4}-\d{2}-\d{2}$/)) }),
+  access: "write",
+  destructive: false,
+  idempotent: true,
+  run: ({ tenant, services, via }, input) =>
+    runSearch(tenant, services, input.id, { via, scheduledFor: input.scheduledFor }),
+});
+
+export const verOfertas = defineOperation({
+  name: "ver_ofertas",
+  title: "List a search's postings",
+  description:
+    "The postings a search found, newest first: title, company, place, remote or not, pay when the board says it, and links. `open` (default) leaves out closed postings and duplicates of a job already listed. Use ver_oferta for one posting's full description.",
+  input: listPostingsSchema,
+  access: "read",
+  destructive: false,
+  idempotent: true,
+  run: ({ tenant }, input) => listPostings(tenant, input),
+});
+
+export const verOferta = defineOperation({
+  name: "ver_oferta",
+  title: "Show a posting",
+  description: "One posting with its full description as the company published it.",
+  input: postingIdSchema,
+  access: "read",
+  destructive: false,
+  idempotent: true,
+  run: ({ tenant }, input) => getPosting(tenant, input.id),
+});
+
+export const verCorridas = defineOperation({
+  name: "ver_corridas",
+  title: "Show a search's latest runs",
+  description:
+    "The last five times a search read its boards: when, whether it went well, how many postings it found and added, and which companies' boards failed (not found or not answering).",
+  input: runSearchSchema,
+  access: "read",
+  destructive: false,
+  idempotent: true,
+  run: ({ tenant }, input) => listSearchRuns(tenant, input.id),
+});
+
 export const operations: readonly Operation[] = [
   estadoBusqueda,
   encenderBusqueda,
@@ -267,4 +331,8 @@ export const operations: readonly Operation[] = [
   borrarBusqueda,
   agregarEmpresa,
   quitarEmpresa,
+  correrBusqueda,
+  verOfertas,
+  verOferta,
+  verCorridas,
 ];

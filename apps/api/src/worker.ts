@@ -1,7 +1,9 @@
 import { hostname } from "node:os";
+import { createJobBoardReader } from "@postula/boards";
 import { anySearchActive, beatWorker } from "@postula/core";
 import { createDatabase } from "@postula/db";
 import { getServerEnv } from "@postula/env";
+import { workerMachinesFromEnv } from "@postula/fly";
 import { jobs } from "./jobs";
 import { createQueue, type JobContext } from "./jobs/queue";
 import { createLogger } from "./logger";
@@ -19,7 +21,15 @@ const db = connection.db;
 const queue = createQueue(env.DATABASE_URL);
 const machine = process.env.FLY_MACHINE_ID ?? hostname();
 const startedAt = new Date();
-const ctx: JobContext = { db, log, now: () => new Date() };
+const ctx: JobContext = {
+  db,
+  log,
+  now: () => new Date(),
+  services: { machines: workerMachinesFromEnv(env), boards: createJobBoardReader() },
+  async send(name, data, options) {
+    await queue.send(name, data, options);
+  },
+};
 
 queue.on("error", (error) => log.error({ err: error }, "Queue error"));
 

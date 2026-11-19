@@ -1,6 +1,7 @@
 import type { AuditVia } from "@postula/contracts";
 import { schema } from "@postula/db";
 import type { z } from "zod/mini";
+import type { JobBoardReader } from "./boards";
 import { DomainError } from "./errors";
 import type { WorkerMachines } from "./machines";
 import type { TenantContext } from "./tenant";
@@ -8,6 +9,8 @@ import type { TenantContext } from "./tenant";
 /** What an operation may reach besides the database: injected, so tests fake it. */
 export interface CoreServices {
   machines: WorkerMachines;
+  /** Companies' job boards: needed only to run a search. */
+  boards?: JobBoardReader;
   now?: () => Date;
 }
 

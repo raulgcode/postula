@@ -1,3 +1,4 @@
+import type { CoreServices } from "@postula/core";
 import type { Database } from "@postula/db";
 import { PgBoss } from "pg-boss";
 import type { Logger } from "../logger";
@@ -15,6 +16,9 @@ export interface JobContext {
   db: Database;
   log: Logger;
   now: () => Date;
+  services: CoreServices;
+  /** Queues another job; with `singletonKey`, one already waiting under that key isn't repeated. */
+  send(name: string, data: object, options?: { singletonKey?: string }): Promise<void>;
 }
 
 /** A job the worker runs: its queue name, and optionally when it repeats. */
