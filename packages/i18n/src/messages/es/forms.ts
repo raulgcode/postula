@@ -26,4 +26,9 @@ export const forms = {
   jsonInvalid: "Postula no puede leer este perfil. Revisa que sea el JSON completo.",
   jsonInvalidItem:
     "Al elemento “{id}” le falta algo o tiene un campo mal escrito. Corrígelo y vuelve a cargar.",
+  numberInvalid: "Escribe un número entero dentro del rango",
+  timeInvalid: "Escribe la hora como 08:00",
+  timeZoneInvalid: "Elige una zona horaria como America/Costa_Rica",
+  boardTokenInvalid:
+    "Escribe el nombre del tablero como aparece en su dirección: en minúsculas y sin espacios",
 } as const satisfies Translation<typeof en>["forms"];

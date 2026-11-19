@@ -5,6 +5,15 @@ export {
 } from "./ai-connections";
 export { listAudit } from "./audit";
 export { DomainError, InvalidProfileError, NotFoundError } from "./errors";
+export {
+  addSearchCompany,
+  createSearch,
+  deleteSearch,
+  getSearch,
+  listSearches,
+  removeSearchCompany,
+  updateSearch,
+} from "./job-searches";
 export { localWorkerMachines, type WorkerMachines } from "./machines";
 export {
   type CoreServices,
@@ -32,17 +41,24 @@ export {
   type RateLimitRule,
 } from "./rate-limits";
 export {
+  agregarEmpresa,
   apagarBusqueda,
+  borrarBusqueda,
   borrarItemPerfil,
+  crearBusqueda,
+  editarBusqueda,
   editarPerfil,
   encenderBusqueda,
   estadoBusqueda,
   guardarItemPerfil,
   importarPerfil,
+  listarBusquedas,
   moverItemPerfil,
   operations,
+  quitarEmpresa,
   searchSwitchOperation,
   verAuditoria,
+  verBusqueda,
   verPerfil,
 } from "./registry";
 export {

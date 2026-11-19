@@ -2,6 +2,7 @@
 export const app = {
   navHome: "Home",
   navProfile: "Profile",
+  navSearches: "Searches",
   navSettings: "Settings",
   navLabel: "Main menu",
   homeTitle: "Home",

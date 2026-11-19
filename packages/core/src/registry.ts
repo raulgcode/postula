@@ -1,14 +1,28 @@
 import {
+  addSearchCompanySchema,
+  createSearchSchema,
   deleteProfileItemSchema,
   importProfileSchema,
   listAuditSchema,
   moveProfileItemSchema,
   profileHeaderSchema,
+  removeSearchCompanySchema,
   saveProfileItemSchema,
+  searchIdSchema,
   type setSearchSchema,
+  updateSearchSchema,
 } from "@postula/contracts";
 import { z } from "zod/mini";
 import { listAudit } from "./audit";
+import {
+  addSearchCompany,
+  createSearch,
+  deleteSearch,
+  getSearch,
+  listSearches,
+  removeSearchCompany,
+  updateSearch,
+} from "./job-searches";
 import { defineOperation, type Operation } from "./operations";
 import {
   deleteProfileItem,
@@ -151,6 +165,90 @@ export const importarPerfil = defineOperation({
  * Every operation Postula has. The MCP server serves one tool per entry and a test checks that
  * none is missing, so a new use case reaches the AI the day it ships.
  */
+export const listarBusquedas = defineOperation({
+  name: "listar_busquedas",
+  title: "List searches",
+  description:
+    "The person's searches: each one's name, whether it runs, at what hour and time zone, its mode and how many companies it looks in. Use ver_busqueda for one search's criteria and companies.",
+  input: noInput,
+  access: "read",
+  destructive: false,
+  idempotent: true,
+  run: ({ tenant }) => listSearches(tenant),
+});
+
+export const verBusqueda = defineOperation({
+  name: "ver_busqueda",
+  title: "Show a search",
+  description:
+    "One search with everything: its criteria (titles, keywords, remote, regions, salary, excluded companies; each criterion is a preference unless `required` is true), schedule, mode, minimum score, daily limit and the companies' job boards it looks in.",
+  input: searchIdSchema,
+  access: "read",
+  destructive: false,
+  idempotent: true,
+  run: ({ tenant }, input) => getSearch(tenant, input.id),
+});
+
+export const crearBusqueda = defineOperation({
+  name: "crear_busqueda",
+  title: "Create a search",
+  description:
+    "Creates a search. Criteria are preferences that add or take points, never reasons to discard, unless the person explicitly marks one as `required`; never mark one required on your own. Salary is a year's pay. Leave `companies` out to start with Postula's suggested remote-friendly companies. Show the person what you'll create and ask before calling it.",
+  input: createSearchSchema,
+  access: "write",
+  destructive: false,
+  idempotent: false,
+  run: ({ tenant, services }, input) => createSearch(tenant, input, services.now?.()),
+});
+
+export const editarBusqueda = defineOperation({
+  name: "editar_busqueda",
+  title: "Edit a search",
+  description:
+    "Replaces a search's name, criteria, schedule, mode, minimum score, daily limit and whether it runs (call ver_busqueda first and send everything back with your changes). Its companies don't change: use agregar_empresa and quitar_empresa.",
+  input: updateSearchSchema,
+  access: "write",
+  destructive: false,
+  idempotent: true,
+  run: ({ tenant, services }, input) => updateSearch(tenant, input, services.now?.()),
+});
+
+export const borrarBusqueda = defineOperation({
+  name: "borrar_busqueda",
+  title: "Delete a search",
+  description:
+    "Deletes a search and its list of companies. Ask the person before calling it; to pause a search instead, set `enabled` to false with editar_busqueda.",
+  input: searchIdSchema,
+  access: "write",
+  destructive: true,
+  idempotent: true,
+  run: ({ tenant }, input) => deleteSearch(tenant, input.id),
+});
+
+export const agregarEmpresa = defineOperation({
+  name: "agregar_empresa",
+  title: "Add a company to a search",
+  description:
+    "Adds a company's public job board to a search: the ATS (greenhouse, lever or ashby) and the board name from its address (job-boards.greenhouse.io/<name>, jobs.lever.co/<name>, jobs.ashbyhq.com/<name>). Postula only reads these public boards, never LinkedIn. Adding one the search already has changes nothing.",
+  input: addSearchCompanySchema,
+  access: "write",
+  destructive: false,
+  idempotent: true,
+  run: ({ tenant, services }, input) => addSearchCompany(tenant, input, services.now?.()),
+});
+
+export const quitarEmpresa = defineOperation({
+  name: "quitar_empresa",
+  title: "Remove a company from a search",
+  description:
+    "Takes a company's job board out of a search (by the company's id from ver_busqueda).",
+  input: removeSearchCompanySchema,
+  access: "write",
+  destructive: true,
+  idempotent: true,
+  run: ({ tenant }, input) => removeSearchCompany(tenant, input),
+});
+
 export const operations: readonly Operation[] = [
   estadoBusqueda,
   encenderBusqueda,
@@ -162,4 +260,11 @@ export const operations: readonly Operation[] = [
   borrarItemPerfil,
   moverItemPerfil,
   importarPerfil,
+  listarBusquedas,
+  verBusqueda,
+  crearBusqueda,
+  editarBusqueda,
+  borrarBusqueda,
+  agregarEmpresa,
+  quitarEmpresa,
 ];

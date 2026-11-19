@@ -11,6 +11,8 @@ const panelSections = [
   "/profile/edit",
   "/profile/import",
   "/profile/items/new?kind=experience",
+  "/searches",
+  "/searches/new",
 ];
 // Pages of a signed-in person outside the panel. The consent page with a real request is checked
 // in ai-connection.spec.ts; without one it says the request expired.

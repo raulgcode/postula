@@ -250,6 +250,18 @@ change records a `profile_version` (only when the SHA-256 of the snapshot change
 and documents point to the version they read. `importar_perfil` replaces it all from a JSON CV
 (the panel's "Load a CV" pastes the same JSON) and says which item is wrong.
 
+### Searches
+
+What Postula looks for every day and where (`/app/searches`, `core/src/job-searches.ts`,
+`contracts/src/job-search.ts`). Each search has criteria (titles, keywords in and out, remote,
+regions, a year's salary, excluded companies), an hour and time zone, a mode (`manual` only lists,
+`semi` prepares and waits for approval), the points to prepare an application and a daily limit.
+**Every criterion is a preference** that adds or takes points; only one the person marks
+`required` sets a posting aside, and it still shows with its reason. Excluded companies are always
+set aside. A search looks in companies' public job boards (Greenhouse, Lever, Ashby, by the board
+name in their address), never LinkedIn; without `companies`, `crear_busqueda` starts with
+`suggestedCompanies`. The panel's form uses `searchFormSchema` (an unchecked "runs" box is off).
+
 ### The worker and "Búsqueda activa"
 
 The `worker` process group of `postula-api` (`apps/api/src/worker.ts`) runs the pg-boss queue

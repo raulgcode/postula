@@ -5,6 +5,7 @@ import type { en } from "../en";
 export const app = {
   navHome: "Inicio",
   navProfile: "Perfil",
+  navSearches: "Búsquedas",
   navSettings: "Ajustes",
   navLabel: "Menú principal",
   homeTitle: "Inicio",

@@ -19,4 +19,8 @@ export const forms = {
   jsonInvalid: "This isn't a profile Postula can read. Check that it's the whole JSON file.",
   jsonInvalidItem:
     "The item “{id}” is missing something or has a field written wrong. Fix it and load again.",
+  numberInvalid: "Write a whole number within range",
+  timeInvalid: "Write the hour as 08:00",
+  timeZoneInvalid: "Pick a time zone such as America/Costa_Rica",
+  boardTokenInvalid: "Write the board's name as it appears in its address: lowercase, no spaces",
 } as const;
