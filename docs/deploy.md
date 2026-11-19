@@ -30,10 +30,35 @@ If a name is taken, pick another and change it in `app = "…"` of the `fly.*.to
 
 ### 2. Database
 
-Any Postgres 16+ reachable from `iad` works; the plan weighs Neon's free plan against an
-unmanaged Postgres machine on Fly (cheapest, backed up with a daily `pg_dump`). The choice is
-still open: this step gets its exact commands when it's made. Either way, `DATABASE_URL` is a
-direct URL (not a transaction pooler: pg-boss needs session features).
+Postgres runs as one machine of its own on Fly (`postula-db`, unmanaged, about US$2–3 a month
+with a 1 GB volume), in the same region as the apps:
+
+```bash
+fly postgres create --name postula-db --region iad --initial-cluster-size 1 \
+  --vm-size shared-cpu-1x --volume-size 1 --image-ref flyio/postgres-flex:17
+```
+
+It prints the `postgres` user's password once: keep it in your password manager. Then create
+the app's database and user:
+
+```bash
+fly postgres connect -a postula-db
+# inside psql:
+#   create user postula with password '<a new one: openssl rand -hex 24>';
+#   create database postula owner postula;
+#   \q
+```
+
+`DATABASE_URL` is
+`postgres://postula:<that password>@postula-db.flycast:5432/postula` (the private network, a
+direct connection: no transaction pooler, pg-boss needs session features). The API's
+`release_command` runs the migrations on each deploy.
+
+**Backups.** Fly takes a snapshot of the volume every day and keeps it 5 days
+(`fly volumes list -a postula-db`, `fly volumes snapshots list <volume id>`). To restore one:
+`fly postgres create --snapshot-id <id> …` with the same flags, and point `DATABASE_URL` at the
+new app. For a copy on your own machine: `fly proxy 15432:5432 -a postula-db` and, in another
+terminal, `pg_dump postgres://postula:<password>@localhost:15432/postula > postula.sql`.
 
 ### 3. Secrets
 

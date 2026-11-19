@@ -287,6 +287,9 @@ Every new variable goes in `.env.example` with a comment saying what it is, and 
 
 ## Workflow
 
+- Work goes straight to `main` once lint, typecheck and tests pass: the owner pulls `main` and
+  tests it locally, without reviewing PRs. Each delivery says which commands to run (README,
+  "Run it on your machine").
 - **Every branch that will be merged into `main` first gets the latest `main`**: `git fetch
   origin main` and `git merge origin/main` (resolve conflicts, regenerate generated files with
   their CLI, such as a migration whose number clashes), run lint, typecheck and tests, push and
