@@ -1,5 +1,6 @@
 import { createDatabase } from "@postula/db";
 import { getServerEnv } from "@postula/env";
+import { workerMachinesFromEnv } from "@postula/fly";
 import { buildApp } from "./app";
 
 const env = getServerEnv();
@@ -9,6 +10,8 @@ const connection = createDatabase(env.DATABASE_URL);
 const app = await buildApp({
   db: connection.db,
   appUrl: env.APP_URL,
+  apiUrl: env.API_URL,
+  services: { machines: workerMachinesFromEnv(env) },
   clientIpHeader: env.CLIENT_IP_HEADER,
   logger: env.NODE_ENV === "development" ? { transport: { target: "pino-pretty" } } : true,
 });

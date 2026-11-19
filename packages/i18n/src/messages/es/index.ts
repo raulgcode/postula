@@ -1,5 +1,6 @@
 import type { Translation } from "../../translate";
 import type { en } from "../en";
+import { ai } from "./ai";
 import { app } from "./app";
 import { auth } from "./auth";
 import { common } from "./common";
@@ -9,6 +10,7 @@ import { home } from "./home";
 import { settings } from "./settings";
 
 export const es = {
+  ai,
   app,
   auth,
   common,

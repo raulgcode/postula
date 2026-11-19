@@ -1,3 +1,4 @@
+import { ai } from "./ai";
 import { app } from "./app";
 import { auth } from "./auth";
 import { common } from "./common";
@@ -8,6 +9,7 @@ import { settings } from "./settings";
 
 /** The source language. A new namespace is added here and in `es/index.ts`. */
 export const en = {
+  ai,
   app,
   auth,
   common,

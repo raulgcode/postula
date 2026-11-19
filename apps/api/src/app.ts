@@ -2,7 +2,7 @@ import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import sensible from "@fastify/sensible";
 import swagger from "@fastify/swagger";
-import { DomainError, NotFoundError } from "@postula/core";
+import { type CoreServices, DomainError, NotFoundError } from "@postula/core";
 import type { Database } from "@postula/db";
 import Fastify, { type FastifyServerOptions } from "fastify";
 import {
@@ -13,10 +13,17 @@ import {
   type ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { healthRoutes } from "./routes/health";
+import { mcpRoutes } from "./routes/mcp";
 
 export interface BuildAppOptions {
   db: Database;
   appUrl: string;
+  /** This API's own address, for the MCP server's OAuth metadata. */
+  apiUrl: string;
+  /** What core's operations reach besides the database (the worker's machines). */
+  services: CoreServices;
+  /** MCP calls one person may make per minute. */
+  mcpRateLimit?: number;
   /** The header with the caller's IP, set by the platform's proxy (Fly-Client-IP on Fly.io). */
   clientIpHeader?: string;
   logger?: FastifyServerOptions["logger"];
@@ -36,6 +43,9 @@ declare module "fastify" {
 export async function buildApp({
   db,
   appUrl,
+  apiUrl,
+  services,
+  mcpRateLimit,
   clientIpHeader = "fly-client-ip",
   logger = false,
 }: BuildAppOptions) {
@@ -70,6 +80,7 @@ export async function buildApp({
 
   app.get("/openapi.json", { schema: { hide: true } }, () => app.swagger());
   await app.register(healthRoutes);
+  await app.register(mcpRoutes, { apiUrl, appUrl, services, rateLimit: mcpRateLimit });
 
   return app;
 }

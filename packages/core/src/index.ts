@@ -1,3 +1,8 @@
+export {
+  type AiCaller,
+  authenticateAiToken,
+  hashOAuthToken,
+} from "./ai-connections";
 export { listAudit } from "./audit";
 export { DomainError, NotFoundError } from "./errors";
 export { localWorkerMachines, type WorkerMachines } from "./machines";

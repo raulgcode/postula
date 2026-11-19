@@ -1,3 +1,5 @@
+import { oauthProvider } from "@better-auth/oauth-provider";
+import { aiConnectionScopes, aiTokenPrefixes } from "@postula/contracts";
 import { type Database, schema } from "@postula/db";
 import {
   AccountEmail,
@@ -39,7 +41,44 @@ export interface CreateAuthOptions {
   clientIpHeader?: string;
   /** Local development only: enables `auth.api.devSignIn` (see dev-sign-in.ts). */
   devSignIn?: boolean;
+  /** The AIs (Claude, ChatGPT…) that connect to the MCP server with OAuth. */
+  aiConnections: AiConnectionsOptions;
 }
+
+export interface AiConnectionsOptions {
+  /** The MCP server the tokens are for: `${API_URL}/mcp`. */
+  resource: string;
+  /**
+   * How a token is kept in the database. The API checks tokens straight in Postgres with the
+   * same function (`hashOAuthToken` of @postula/core), so a copy of the database can't use them.
+   */
+  hashToken: (token: string) => string;
+}
+
+/** Where Better Auth sends the person to allow an AI. */
+export const AI_CONSENT_PAGE = "/oauth/consent";
+
+/**
+ * OAuth endpoints we don't use over HTTP: AIs register themselves (/oauth2/register) and the
+ * person allows them on the consent page, which calls `auth.api` on the server.
+ */
+export const disabledOAuthPaths = [
+  "/oauth2/create-client",
+  "/oauth2/get-client",
+  "/oauth2/get-clients",
+  "/oauth2/update-client",
+  "/oauth2/delete-client",
+  "/oauth2/client/rotate-secret",
+  "/oauth2/get-consent",
+  "/oauth2/get-consents",
+  "/oauth2/update-consent",
+  "/oauth2/delete-consent",
+  "/admin/oauth2/create-client",
+  "/admin/oauth2/update-client",
+  "/admin/oauth2/resources",
+  "/admin/oauth2/resources/:identifier",
+  "/admin/oauth2/resources/:identifier/clients/:client_id",
+];
 
 export function createAuth({
   db,
@@ -53,6 +92,7 @@ export function createAuth({
   rateLimitStorage,
   clientIpHeader,
   devSignIn: devSignInEnabled = false,
+  aiConnections,
 }: CreateAuthOptions) {
   const password = methods.includes("password");
   if (methods.includes("google") && !google) {
@@ -77,6 +117,7 @@ export function createAuth({
     baseURL,
     secret,
     trustedOrigins: [baseURL, ...trustedOrigins],
+    disabledPaths: disabledOAuthPaths,
     rateLimit: { enabled: rateLimit, customStorage: rateLimitStorage },
     database: drizzleAdapter(db, { provider: "pg", schema }),
     user: {
@@ -135,6 +176,25 @@ export function createAuth({
         },
       }),
       devSignIn(devSignInEnabled),
+      oauthProvider({
+        loginPage: "/login",
+        consentPage: AI_CONSENT_PAGE,
+        scopes: [...aiConnectionScopes],
+        // Opaque tokens, checked by the API in Postgres: no signing keys to share or rotate.
+        disableJwtPlugin: true,
+        storeTokens: { hash: (token) => aiConnections.hashToken(token) },
+        prefix: { ...aiTokenPrefixes },
+        // Claude, ChatGPT and the editors register themselves the first time (RFC 7591), with
+        // no account of theirs here: what protects the person is the sign-in and the consent.
+        allowDynamicClientRegistration: true,
+        allowUnauthenticatedClientRegistration: true,
+        // Editors (Cursor, VS Code) listen on http://127.0.0.1 and often leave the type out.
+        clientRegistrationDefaultApplicationType: "infer",
+        resources: [{ identifier: aiConnections.resource, name: "Postula MCP" }],
+        clientRegistrationDefaultResources: [aiConnections.resource],
+        // Reconnect after 90 days without using it, not every month.
+        refreshTokenExpiresIn: 90 * 24 * 60 * 60,
+      }),
     ],
   });
 }

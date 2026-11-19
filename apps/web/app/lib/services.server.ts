@@ -1,5 +1,6 @@
 import { createAuth, type RateLimitStorage } from "@postula/auth";
-import { type CoreServices, hitRateLimit } from "@postula/core";
+import { mcpUrl } from "@postula/contracts";
+import { type CoreServices, hashOAuthToken, hitRateLimit } from "@postula/core";
 import { createDatabase } from "@postula/db";
 import { createMailer } from "@postula/email";
 import { deriveSecret, getServerEnv, googleCredentials } from "@postula/env";
@@ -48,6 +49,7 @@ export const auth = singleton("__postulaAuth", () =>
     clientIpHeader: env.CLIENT_IP_HEADER,
     // /dev/sign-in signs in as any user; false in every build, so production can't.
     devSignIn: import.meta.env.DEV,
+    aiConnections: { resource: mcpUrl(env.API_URL), hashToken: hashOAuthToken },
   }),
 );
 

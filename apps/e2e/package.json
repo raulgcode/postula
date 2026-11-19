@@ -10,6 +10,7 @@
   "devDependencies": {
     "@axe-core/playwright": "catalog:",
     "@playwright/test": "catalog:",
+    "@postula/contracts": "workspace:*",
     "@postula/core": "workspace:*",
     "@postula/db": "workspace:*",
     "@postula/env": "workspace:*",

@@ -10,6 +10,8 @@
     "auth:generate": "auth generate --config src/cli-config.ts --output ../db/src/schema/auth.ts --yes"
   },
   "dependencies": {
+    "@better-auth/oauth-provider": "catalog:",
+    "@postula/contracts": "workspace:*",
     "@postula/db": "workspace:*",
     "@postula/email": "workspace:*",
     "@postula/env": "workspace:*",

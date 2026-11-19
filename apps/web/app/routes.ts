@@ -11,6 +11,12 @@ export default [
   route("theme", "routes/theme.ts"),
   route("locale", "routes/locale.ts"),
   route("api/auth/*", "routes/api.auth.ts"),
+  // Connecting an AI (Claude, ChatGPT…) to the MCP server: OAuth discovery and the consent page.
+  route(".well-known/oauth-authorization-server", "routes/oauth/authorization-server.ts", {
+    id: "oauth-authorization-server",
+  }),
+  route(".well-known/oauth-authorization-server/api/auth", "routes/oauth/authorization-server.ts"),
+  route("oauth/consent", "routes/oauth/consent.tsx"),
   // Local tools (sign in as any user). Never in a production build: see lib/dev-tools.server.ts.
   ...(process.env.NODE_ENV === "production"
     ? []

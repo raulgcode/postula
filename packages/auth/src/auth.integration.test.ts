@@ -9,6 +9,10 @@ afterAll(() => connection.close());
 
 const baseURL = "http://localhost:5173";
 const google = { clientId: "client-id", clientSecret: "client-secret" };
+const aiConnections = {
+  resource: "http://localhost:3001/mcp",
+  hashToken: (token: string) => `hashed:${token}`,
+};
 
 function authWith(methods: AuthMethod[] = ["magic-link"], sent: SendEmailInput[] = []) {
   return createAuth({
@@ -19,6 +23,7 @@ function authWith(methods: AuthMethod[] = ["magic-link"], sent: SendEmailInput[]
     methods,
     google: methods.includes("google") ? google : undefined,
     rateLimit: false,
+    aiConnections,
   });
 }
 
@@ -57,6 +62,7 @@ describe("Google", () => {
         baseURL,
         secret: "x".repeat(32),
         methods: ["google"],
+        aiConnections,
       }),
     ).toThrow(/GOOGLE_CLIENT_ID/);
   });
@@ -123,6 +129,7 @@ describe("entrar como cualquiera (solo /dev/sign-in en pnpm dev)", () => {
       methods: ["magic-link"],
       rateLimit: false,
       devSignIn: true,
+      aiConnections,
     });
 
   it("signs in and sets the session cookie", async () => {

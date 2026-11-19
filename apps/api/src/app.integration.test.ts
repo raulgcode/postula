@@ -1,3 +1,4 @@
+import { localWorkerMachines } from "@postula/core";
 import { createTestDatabase } from "@postula/db/testing";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { type App, buildApp } from "./app";
@@ -6,7 +7,12 @@ const connection = createTestDatabase();
 let app: App;
 
 beforeAll(async () => {
-  app = await buildApp({ db: connection.db, appUrl: "http://localhost:5173" });
+  app = await buildApp({
+    db: connection.db,
+    appUrl: "http://localhost:5173",
+    apiUrl: "http://localhost:3001",
+    services: { machines: localWorkerMachines },
+  });
 });
 afterAll(async () => {
   await app.close();

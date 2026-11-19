@@ -1,24 +1,30 @@
 # Postula · guide for agents and people
 
 Postula comes from the `mono-template` template: a monorepo with the usual things already solved
-(sign-in with Google, password or an email link, multi-tenant workspaces, languages, light and
-dark theme, emails, security, tests and deployment). The project's own work is written on top,
-following these rules. If a rule doesn't apply, change it here first and then the code.
+(sign-in with Google, password or an email link, languages, light and dark theme, emails,
+security, tests and deployment). The project's own work is written on top, following these rules.
+If a rule doesn't apply, change it here first and then the code.
+
+Postula is a personal job-search automation service: every day it searches new postings for each
+search the person sets up, scores each one against their master profile, tailors a CV and cover
+letter without inventing anything, and applies once they approve. Each person is their own tenant
+(no shared workspaces), and everything the panel does an AI can do through MCP.
 
 ## Monorepo map
 
 | Path                 | What it is                                                          |
 | -------------------- | ------------------------------------------------------------------- |
-| `apps/web`           | React Router 8 (framework mode): pages, sign-in, the workspace      |
-| `apps/api`           | Fastify + Zod: public API, webhooks and scheduled jobs              |
+| `apps/web`           | React Router 8 (framework mode): pages, sign-in, the panel          |
+| `apps/api`           | Fastify + Zod: API, MCP server (`/mcp`) and the worker (pg-boss)    |
 | `apps/e2e`           | Playwright: BDD scenarios on phone and desktop, accessibility (axe) |
-| `packages/core`      | Multi-tenant use cases. All business logic lives here               |
+| `packages/core`      | Use cases per person (the operation registry). All logic lives here |
 | `packages/contracts` | `zod/mini` schemas shared by forms, actions, API and core           |
 | `packages/db`        | Drizzle: schema, migrations, client, test utilities                 |
-| `packages/auth`      | Better Auth: email link, password, Google and organizations         |
+| `packages/auth`      | Better Auth: email link, password, Google and OAuth for AIs         |
 | `packages/email`     | Nodemailer + MJML: branded emails, in light and dark                |
 | `packages/i18n`      | Languages (en, es): typed dictionaries, `t()`, language choice      |
 | `packages/env`       | Environment variable validation with Zod                            |
+| `packages/fly`       | Fly Machines API: starts and stops the worker for "Búsqueda activa" |
 | `tooling/*`          | Repo scripts: setup, release, Fly secrets, remote e2e               |
 
 ## Rules
@@ -74,12 +80,12 @@ enlarged version, never the other way around.
 1. **Mobile first.** Every screen works from 360 px wide, and every BDD scenario runs in
    Playwright's `mobile` project, not only in `desktop`.
 2. **One task, one screen, one main action.** The main button stays within thumb reach and
-   everything tappable is at least 44 × 44 px. In the workspace, the sections are the bottom bar
+   everything tappable is at least 44 × 44 px. In the panel, the sections are the bottom bar
    on the phone and the sidebar from 768 px (`AppShell`; a new section is one more item).
 3. **Nothing depends on hover, a physical keyboard or wide tables.** What scrolls sideways goes in
    `<ScrollShadow>`; on the phone, tables become lists.
 4. **Talk the way people talk.** Words they would say out loud, no technical jargon ("tenant",
-   "organization") in the interface: in the app it's a "workspace".
+   "worker", "OAuth", "MCP") in the interface: it's "your search", "connect an AI".
 5. **Defaults that already work.** A new screen starts filled in with the usual values.
 6. **Every screen explains itself.** If it needs a tutorial to be used, it gets redesigned.
 
@@ -99,15 +105,16 @@ A change that adds or changes behavior without tests isn't finished.
 | Playwright    | `apps/e2e/tests/*.spec.ts`           | Full flows, accessibility with axe, mobile and desktop |
 
 **Don't use Jest or jsdom.** Components are tested in a real browser with
-`vitest-browser-react`. Each integration test creates its own workspace with `createTestTenant`
-(`@postula/db/testing`); never share rows between tests or truncate tables.
+`vitest-browser-react`. Each integration test creates its own person with `createTestTenant`
+(`@postula/db/testing`); never share rows between tests or truncate tables. An AI connection for
+a test (client, consent and token) comes from `createTestAiConnection`.
 
 In Playwright (`apps/e2e/support/fixtures.ts`):
-- `ownerTest` starts with the worker's shared session (an owner with the "My company" workspace)
-  and its `workspace`; `test` + `signIn`/`signInWithWorkspace` is for sign-in, onboarding or
-  anything that changes the account (language, sign out), because the worker's session is shared.
-- What a scenario prepares in the database goes through `core`'s use cases with
-  `workspace.tenant` or `workspaceOf(page)`, over the worker's `db` connection; never a connection
+- `ownerTest` starts with the worker's shared session and its `account` (`{ email, userId,
+  tenant }`); `test` + `signIn` is for sign-in or anything that changes the account (language,
+  sign out, the search switch), because the worker's session is shared.
+- What a scenario prepares in the database goes through `core`'s use cases (`runOperation`) with
+  `account.tenant` or `accountOf(email)`, over the worker's `db` connection; never a connection
   of its own. Another browser (a teammate, another phone) is opened with `newVisitor()`, without a
   session.
 - What is set up and cleaned up on its own is a fixture; a screen that 3 or more specs walk
@@ -115,7 +122,7 @@ In Playwright (`apps/e2e/support/fixtures.ts`):
   `mailpit.ts` with `getLinkFromEmail`/`uniqueEmail`). The page object acts and the scenario
   checks.
 - Each scenario proves one behavior and says so in its title, with its result ("creates an
-  account, confirms the email and goes on to create a workspace", not "sign-up works"), and each
+  account, confirms the email and lands on the panel", not "sign-up works"), and each
   Then checks the exact text, number or state the person sees. Locators by role, label or text,
   in English (the source language). `pnpm lint` rejects in `tests/` (`apps/e2e/lint/*.grit`)
   `waitForTimeout`, `networkidle`, `.only`, `force: true` and XPath.
@@ -183,23 +190,67 @@ and the routes of a method that is off respond 404 (`requireMethod`).
 - **Google**: needs `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` (the server won't start with
   `google` without them). An email proven by Google, a link or a confirmation is the same account.
 - Actions go through Better Auth's server API (`auth.api.*`) after our own checks (rate limits,
-  `safeRedirect`). Endpoints we don't use over HTTP go in `disabledOrganizationPaths`.
+  `safeRedirect`). Endpoints we don't use over HTTP go in `disabledOAuthPaths`.
 - `/dev/sign-in` signs in as any user in `pnpm dev`. Three locks keep it out of production:
   `routes.ts` doesn't register the route in the build, `devSignIn` is only on with
   `import.meta.env.DEV` and `requireDevTools` requires localhost.
 
-### Multi-tenant
+### Tenant: each person
 
-Every `core` use case takes a `TenantContext` and filters by `organizationId`.
-- The workspace goes in the URL (`/app/:workspace/…`) and `requireTenant` resolves it with
-  `resolveTenant`, which checks the membership; never take the workspace from the session or from
-  a form field. Someone else's workspace responds 404, the same as one that doesn't exist.
-- The session only remembers the last workspace used, so `/app` and the next sign-in open it.
+Every `core` use case takes a `TenantContext` (`{ db, userId }`) and filters by `user_id`: every
+table of the person's data has one, with `on delete cascade`.
+- `requireTenant` (`app/middleware/auth.server.ts`) builds it from the signed-in user; the API
+  and MCP build it from the authenticated token. Never from a form field or a tool argument.
 - The only entry points without a tenant are the public ones, and each one is justified here.
-- A new workspace section: `routes/app/<section>.tsx` under `:workspace` in `routes.ts`, its item
-  in `AppShell`, its i18n namespace, its `core` use case with an integration test (including that
-  another workspace can't see its data), its BDD scenario and its line in
+- A new panel section: `routes/app/<section>.tsx` under the `/app` layout in `routes.ts`, its
+  item in `AppShell`, its i18n namespace, its `core` operation with an integration test
+  (including that another person can't see its data), its BDD scenario and its line in
   `accessibility.spec.ts`.
+
+### Operations: one use case, three doors (panel, MCP, API)
+
+Every use case is an `Operation` (`defineOperation` in `core/src/operations.ts`) listed in
+`operations` (`core/src/registry.ts`): name in Spanish snake_case (it is the MCP tool's name),
+`title` and `description` in English for the AI, a `zod/mini` input, `access` (`read`/`write`),
+`destructive` and `idempotent`.
+- The web's loaders and actions, the API and the MCP server all call `runOperation`, which
+  validates the input and writes every `write` to `audit_log` with where it came from (`via`:
+  web, mcp, api, worker), the AI's name and the outcome (`ok` or the error's code), even when it
+  fails. `ver_auditoria` reads it.
+- A new operation goes into `operations` and reaches the AI that day: the MCP server serves one
+  tool per entry (`apps/api/src/mcp/server.ts`) and `mcp.integration.test.ts` checks none is
+  missing.
+- What an AI generates (CVs, letters) is always shown and editable before anything is sent, and
+  never adds a fact that isn't in the master profile.
+
+### MCP and connecting an AI
+
+`POST API_URL/mcp` (`apps/api/src/routes/mcp.ts`, `@modelcontextprotocol/server`, stateless:
+any machine answers any call). Claude, ChatGPT and the editors connect with OAuth:
+- The web's Better Auth is the authorization server (`@better-auth/oauth-provider`): dynamic
+  client registration, `resource` = the MCP's address, scopes `read`, `write` and
+  `offline_access`. The person allows the AI on `/oauth/consent`; `/login` resumes a signed
+  authorization request after signing in (`authorizeContinuation`, `lib/oauth.server.ts`).
+- Tokens are opaque (`pst_at_`/`pst_rt_`) and kept as their SHA-256 (`hashOAuthToken`), so the API
+  checks them in Postgres with `authenticateAiToken` (`core/src/ai-connections.ts`). Deleting the
+  consent stops its tokens at once.
+- A call without a valid token gets a 401 with `WWW-Authenticate: Bearer resource_metadata=…`
+  (`/.well-known/oauth-protected-resource/mcp`). A `write` tool needs the `write` scope. 60 calls
+  a minute per person (`hitRateLimit`).
+- Every tool has `title` and the `readOnlyHint`, `destructiveHint` and `idempotentHint`
+  annotations, taken from the operation.
+
+### The worker and "Búsqueda activa"
+
+The `worker` process group of `postula-api` (`apps/api/src/worker.ts`) runs the pg-boss queue
+(schema `pgboss` of the same Postgres) and the crons. Jobs are defined with `defineJob`
+(`apps/api/src/jobs`), crons with `tz` and `missed: "once"`.
+- The panel's switch (and `encender_busqueda`/`apagar_busqueda`) is `setSearchActive`: turning
+  on starts the worker's Fly machine (`@postula/fly`, `FLY_API_TOKEN`) before saving; turning off
+  saves and stops it only when nobody else has it on.
+- The worker beats every 30 s (`worker_beat`) and exits with 0 when nobody has the search on, so
+  `[[restart]] policy = "on-failure"` leaves it stopped. `pnpm dev` runs the API and the worker in
+  one process (`src/dev.ts`).
 
 ### Security
 
