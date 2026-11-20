@@ -85,4 +85,26 @@ describe("the panel's search form", () => {
     expect(searchFormSchema.parse({ name: "Paused" }).enabled).toBe(false);
     expect(searchSettingsSchema.parse({ name: "Running" }).enabled).toBe(true);
   });
+
+  it("splits a textarea's lines into one entry each, as the form sends them", () => {
+    const parsed = searchFormSchema.parse({
+      name: "x",
+      criteria: {
+        titles: { values: ["Senior Engineer\r\nStaff Engineer"] },
+        regions: { values: ["Costa Rica\nLatin America\n\n Anywhere "] },
+        excludedCompanies: ["Altimetrik\ncgi"],
+      },
+    });
+    expect(parsed.criteria.titles.values).toEqual(["Senior Engineer", "Staff Engineer"]);
+    expect(parsed.criteria.regions.values).toEqual(["Costa Rica", "Latin America", "Anywhere"]);
+    expect(parsed.criteria.excludedCompanies).toEqual(["Altimetrik", "cgi"]);
+  });
+
+  it("keeps a comma inside one line of a textarea, like a company's name", () => {
+    const parsed = searchFormSchema.parse({
+      name: "x",
+      criteria: { excludedCompanies: ["Acme, Inc."] },
+    });
+    expect(parsed.criteria.excludedCompanies).toEqual(["Acme, Inc."]);
+  });
 });

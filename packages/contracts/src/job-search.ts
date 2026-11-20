@@ -40,7 +40,11 @@ const words = z.pipe(
   z.pipe(
     z.optional(z.union([z.array(z.string()), z.string()])),
     z.transform((value) => {
-      const parts = Array.isArray(value) ? value : (value ?? "").split(/[,\n]/);
+      // A form's textarea arrives as one element with every line in it, so each element is
+      // split by line too; a plain string (an AI, the API) may also use commas.
+      const parts = Array.isArray(value)
+        ? value.flatMap((part) => part.split(/\r?\n/))
+        : (value ?? "").split(/[,\n]/);
       return [...new Set(parts.map((part) => part.trim()).filter(Boolean))];
     }),
   ),

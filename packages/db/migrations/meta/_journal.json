@@ -36,6 +36,13 @@
       "when": 1795136312014,
       "tag": "0004_require_remote_and_place",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795137298490,
+      "tag": "0005_split_search_lists",
+      "breakpoints": true
     }
   ]
 }

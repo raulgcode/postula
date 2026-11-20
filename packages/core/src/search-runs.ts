@@ -207,7 +207,8 @@ async function saveBoard(
 /**
  * Each new posting that is the same job as one found before (or earlier in the same run), on
  * any board, points to that first one. After every board is saved, so two boards read at the
- * same time still see each other.
+ * same time still see each other. Boards of one run share its start time, so the tie goes to
+ * the board, then its name: the same copy is listed every time.
  */
 async function markDuplicates(db: Db, insertedIds: string[]) {
   if (insertedIds.length === 0) return;
@@ -216,8 +217,9 @@ async function markDuplicates(db: Db, insertedIds: string[]) {
       select o.id from job_posting o
       where o.user_id = p.user_id and o.fingerprint = p.fingerprint
         and o.duplicate_of_id is null
-        and (o.first_seen_at, o.id) < (p.first_seen_at, p.id)
-      order by o.first_seen_at, o.id
+        and (o.first_seen_at, o.board, o.token, o.external_id)
+          < (p.first_seen_at, p.board, p.token, p.external_id)
+      order by o.first_seen_at, o.board, o.token, o.external_id
       limit 1
     )
     where p.id in (${sql.join(
@@ -311,7 +313,7 @@ export async function runSearch(
       board,
       company.token,
       read.postings,
-      now(),
+      run.startedAt,
     );
     totals.found += saved.found;
     totals.added += saved.added;
