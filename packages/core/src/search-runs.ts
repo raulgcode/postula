@@ -7,10 +7,12 @@ import {
   POSTING_DESCRIPTION_MAX,
   type PostingSalary,
   postingFingerprint,
+  type SearchCriteria,
   type SearchRun,
+  setAsideReasonsOf,
   type Workplace,
 } from "@postula/contracts";
-import { and, asc, count, desc, eq, inArray, isNull, notInArray, schema, sql } from "@postula/db";
+import { and, asc, desc, eq, inArray, isNull, notInArray, schema, sql } from "@postula/db";
 import type { BoardRead } from "./boards";
 import { DomainError } from "./errors";
 import type { CoreServices } from "./operations";
@@ -42,7 +44,9 @@ function runOf(row: typeof schema.searchRun.$inferSelect): SearchRun {
   };
 }
 
-function summaryOf(row: typeof schema.jobPosting.$inferSelect): JobPostingSummary {
+function summaryOf(
+  row: typeof schema.jobPosting.$inferSelect,
+): Omit<JobPostingSummary, "setAsideReasons"> {
   return {
     id: row.id,
     board: row.board as JobBoard,
@@ -328,35 +332,54 @@ export async function runSearch(
   return runOf(finished);
 }
 
-/** A search's postings, newest first. Open ones by default: closed and duplicates set aside. */
+/**
+ * A search's postings, newest first. By default the open ones that meet what the search
+ * requires (remote, the place, …), without duplicates; `set_aside` lists the others with their
+ * reasons. Reasons are worked out with today's criteria, so changing them changes the lists.
+ */
 export async function listPostings(
   tenant: TenantContext,
   input: ListPostingsInput,
-): Promise<{ total: number; postings: JobPostingSummary[] }> {
-  await searchCompanies(tenant, input.searchId);
-  const where = and(
-    eq(schema.searchPosting.searchId, input.searchId),
-    eq(schema.searchPosting.userId, tenant.userId),
-    input.status === "open" ? isNull(schema.jobPosting.closedAt) : undefined,
-    input.status === "open" ? isNull(schema.jobPosting.duplicateOfId) : undefined,
-  );
-  const [counted] = await tenant.db
-    .select({ total: count() })
-    .from(schema.searchPosting)
-    .innerJoin(schema.jobPosting, eq(schema.jobPosting.id, schema.searchPosting.postingId))
-    .where(where);
+): Promise<{ total: number; open: number; setAside: number; postings: JobPostingSummary[] }> {
+  const [search] = await tenant.db
+    .select({ criteria: schema.jobSearch.criteria })
+    .from(schema.jobSearch)
+    .where(
+      and(eq(schema.jobSearch.id, input.searchId), eq(schema.jobSearch.userId, tenant.userId)),
+    );
+  if (!search) throw notFound();
+  const criteria = search.criteria as SearchCriteria;
   const rows = await tenant.db
     .select({ posting: schema.jobPosting })
     .from(schema.searchPosting)
     .innerJoin(schema.jobPosting, eq(schema.jobPosting.id, schema.searchPosting.postingId))
-    .where(where)
+    .where(
+      and(
+        eq(schema.searchPosting.searchId, input.searchId),
+        eq(schema.searchPosting.userId, tenant.userId),
+      ),
+    )
     .orderBy(
       desc(sql`coalesce(${schema.jobPosting.publishedAt}, ${schema.jobPosting.firstSeenAt})`),
       asc(schema.jobPosting.id),
-    )
-    .limit(input.limit)
-    .offset(input.offset);
-  return { total: counted?.total ?? 0, postings: rows.map((row) => summaryOf(row.posting)) };
+    );
+  const all = rows.map(({ posting }) => ({
+    ...summaryOf(posting),
+    setAsideReasons: setAsideReasonsOf(
+      posting as Parameters<typeof setAsideReasonsOf>[0],
+      criteria,
+    ),
+  }));
+  const current = all.filter((posting) => !posting.closedAt && !posting.duplicateOfId);
+  const open = current.filter((posting) => posting.setAsideReasons.length === 0);
+  const setAside = current.filter((posting) => posting.setAsideReasons.length > 0);
+  const listed = { open, set_aside: setAside, all }[input.status];
+  return {
+    total: listed.length,
+    open: open.length,
+    setAside: setAside.length,
+    postings: listed.slice(input.offset, input.offset + input.limit),
+  };
 }
 
 /** One posting with its full description, or `not_found` when it isn't the person's. */

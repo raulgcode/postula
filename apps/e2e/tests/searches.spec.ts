@@ -1,4 +1,5 @@
 import type { BoardPosting } from "@postula/contracts";
+import { defaultSearchSettings } from "@postula/contracts";
 import {
   correrBusqueda,
   crearBusqueda,
@@ -38,6 +39,24 @@ const boards: JobBoardReader = {
             salary: { min: 60000, max: 80000, currency: "USD", interval: "year" },
           }),
           posting("2", { title: "Design Engineer", workplace: "hybrid", location: "Austin" }),
+        ],
+      };
+    }
+    if (token === "initech") {
+      return {
+        status: "ok",
+        postings: [
+          posting("31", {
+            company: "Initech",
+            title: "React Engineer",
+            location: "Remote - LATAM",
+          }),
+          posting("32", {
+            company: "Initech",
+            title: "Staff Engineer",
+            location: "New York, NY (Hybrid)",
+            workplace: "hybrid",
+          }),
         ],
       };
     }
@@ -234,6 +253,43 @@ test.describe("Feature: searches", () => {
       );
       await expect(postings.filter({ hasText: "Design Engineer" })).toContainText(
         "Austin · Hybrid",
+      );
+      await expectAccessible(page);
+    });
+  });
+
+  test("Scenario: the usual search keeps a remote LATAM job and sets aside a hybrid one in New York, saying why", async ({
+    page,
+    signIn,
+    accountOf,
+    expectAccessible,
+  }) => {
+    await test.step("Given the usual search ran on a board with both jobs", async () => {
+      const { tenant } = await accountOf(await signIn(page));
+      const search = await runOperation(crearBusqueda, prepare(tenant), {
+        ...defaultSearchSettings,
+        companies: [{ board: "greenhouse", token: "initech", company: "Initech" }],
+      });
+      await runOperation(correrBusqueda, prepare(tenant), { id: search.id });
+      await page.goto(`/app/searches/${search.id}/postings`);
+    });
+
+    await test.step("Then only the remote LATAM job is in the list", async () => {
+      const postings = page.getByRole("list", { name: "Postings" }).getByRole("listitem");
+      await expect(postings).toHaveCount(1);
+      await expect(postings).toContainText("React Engineer");
+      await expect(page.getByRole("link", { name: "Set aside (1)" })).toBeVisible();
+    });
+
+    await test.step("When they open what was set aside", async () => {
+      await page.getByRole("link", { name: "Set aside (1)" }).click();
+    });
+
+    await test.step("Then the New York job is there with its reasons", async () => {
+      const postings = page.getByRole("list", { name: "Postings" }).getByRole("listitem");
+      await expect(postings).toHaveCount(1);
+      await expect(postings).toContainText(
+        "Set aside: Not remote · Doesn't say it hires from Costa Rica, Latin America, or Anywhere",
       );
       await expectAccessible(page);
     });

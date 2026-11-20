@@ -29,6 +29,13 @@
       "when": 1795102459994,
       "tag": "0003_job_posting",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795136312014,
+      "tag": "0004_require_remote_and_place",
+      "breakpoints": true
     }
   ]
 }

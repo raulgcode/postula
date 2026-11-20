@@ -248,8 +248,8 @@ export const suggestedCompanies: readonly z.input<typeof companyBoard>[] = [
 ];
 
 /**
- * The first search, as agreed: remote preferred, open to people in Costa Rica or Latin America,
- * US$60,000 a year ideal and US$50,000 acceptable, all as preferences.
+ * The first search, as agreed: only remote jobs that hire from Costa Rica, Latin America or
+ * anywhere (required); US$60,000 a year ideal and US$50,000 acceptable, as preferences.
  */
 export const defaultSearchSettings: z.input<typeof searchSettingsSchema> = {
   name: "Remote, well paid",
@@ -263,10 +263,11 @@ export const defaultSearchSettings: z.input<typeof searchSettingsSchema> = {
       exclude: [],
       required: false,
     },
-    remote: { value: "remote", required: false },
+    // Required: a job that isn't remote, or doesn't hire from here, is set aside.
+    remote: { value: "remote", required: true },
     regions: {
-      values: ["Costa Rica", "Latin America", "Americas", "Anywhere"],
-      required: false,
+      values: ["Costa Rica", "Latin America", "Anywhere"],
+      required: true,
     },
     salary: { ideal: 60_000, minimum: 50_000, currency: "USD", required: false },
     excludedCompanies: [],

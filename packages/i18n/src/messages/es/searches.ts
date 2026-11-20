@@ -4,10 +4,10 @@ import type { en } from "../en";
 export const searches = {
   title: "Tus búsquedas",
   intro:
-    "Lo que Postula busca cada día y dónde. Todo lo que pones es una preferencia: suma o resta puntos, y cada oferta sigue en tu lista.",
+    "Lo que Postula busca cada día y dónde. Lo que pones suma o resta puntos; lo que marcas como obligatorio deja aparte las ofertas que no lo cumplen, y igual puedes verlas.",
   emptyTitle: "Todavía no tienes una búsqueda",
   emptyIntro:
-    "Empieza con la de siempre: remoto, abierto a Costa Rica y Latinoamérica, US$60 000 al año como ideal, en 27 empresas que contratan en remoto. Puedes cambiarlo todo.",
+    "Empieza con la de siempre: solo trabajos remotos que contraten desde Costa Rica, Latinoamérica o cualquier lugar, US$60 000 al año como ideal, en 27 empresas que contratan en remoto. Puedes cambiarlo todo.",
   newAction: "Nueva búsqueda",
   newTitle: "Nueva búsqueda",
   newIntro: "Empieza llena con lo de siempre. Cambia lo que quieras y guarda.",
@@ -94,6 +94,24 @@ export const searches = {
     "Lo que las páginas de empleo de las empresas tienen hoy, de la más nueva a la más vieja. El mismo puesto en dos páginas sale una vez, y las ofertas cerradas salen de la lista.",
   postingsEmpty: "Todavía no hay ofertas abiertas. Usa “Buscar ahora” en la página de la búsqueda.",
   postingsCount: { one: "{count} oferta abierta", other: "{count} ofertas abiertas" },
+  setAsideCount: {
+    one: "{count} más quedó aparte por no cumplir lo que marcaste como obligatorio.",
+    other: "{count} más quedaron aparte por no cumplir lo que marcaste como obligatorio.",
+  },
+  showOpen: "En tu lista ({count})",
+  showSetAside: "Aparte ({count})",
+  showLabel: "Qué ofertas",
+  setAsideIntro:
+    "Ofertas abiertas a las que les falta algo que marcaste como obligatorio. Cámbialo en la búsqueda y vuelven.",
+  setAsideEmpty: "Nada aparte: cada oferta abierta cumple lo que pides.",
+  reasonExcludedCompany: "Una empresa que nunca quieres",
+  reasonNotRemote: "No es remota",
+  reasonRegion: "No dice que contrate desde {regions}",
+  reasonTitle: "El puesto no tiene tus palabras",
+  reasonKeywords: "No menciona tus palabras",
+  reasonExcludedKeyword: "Menciona una palabra que no quieres",
+  reasonSalary: "Paga menos que tu mínimo",
+  setAsideBecause: "Aparte: {reasons}",
   backToSearch: "Volver a la búsqueda",
   workplaceRemote: "Remoto",
   workplaceHybrid: "Híbrido",

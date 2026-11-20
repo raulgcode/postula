@@ -262,6 +262,10 @@ regions, a year's salary, excluded companies), an hour and time zone, a mode (`m
 set aside. A search looks in companies' public job boards (Greenhouse, Lever, Ashby, by the board
 name in their address), never LinkedIn; without `companies`, `crear_busqueda` starts with
 `suggestedCompanies`. The panel's form uses `searchFormSchema` (an unchecked "runs" box is off).
+What a search requires is applied by `setAsideReasonsOf` (`contracts/src/posting-filter.ts`, pure)
+when its postings are listed: strict, so "Remote" without the place it hires from doesn't meet a
+required region (`regionAliases`: LATAM, worldwide…). The default search requires remote and
+Costa Rica, Latin America or Anywhere; `ver_ofertas` lists `open` or `set_aside` with reasons.
 
 ### Postings and the daily run
 

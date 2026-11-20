@@ -1,4 +1,9 @@
-import { type BoardPosting, createSearchSchema, listPostingsSchema } from "@postula/contracts";
+import {
+  type BoardPosting,
+  createSearchSchema,
+  defaultSearchSettings,
+  listPostingsSchema,
+} from "@postula/contracts";
 import { eq, schema } from "@postula/db";
 import { createTestDatabase, createTestTenant } from "@postula/db/testing";
 import { afterAll, describe, expect, it } from "vitest";
@@ -142,6 +147,44 @@ describe("running a search", () => {
       listPostingsSchema.parse({ searchId: search.id, status: "all" }),
     );
     expect(all.postings.filter((entry) => entry.duplicateOfId)).toHaveLength(1);
+  });
+
+  it("sets aside what the search requires and the posting misses, and says why", async () => {
+    const ctx = await tenant();
+    const search = await createSearch(
+      ctx,
+      createSearchSchema.parse({
+        ...defaultSearchSettings,
+        companies: [{ board: "greenhouse", token: "acme" }],
+      }),
+    );
+    await runSearch(
+      ctx,
+      services(
+        fakeBoards({
+          acme: {
+            status: "ok",
+            postings: [
+              posting("1", { location: "Remote - LATAM" }),
+              posting("2", { location: "New York, NY (Hybrid)", workplace: "hybrid" }),
+              posting("3", { location: "Remote - US" }),
+            ],
+          },
+        }),
+      ),
+      search.id,
+      { via: "web" },
+    );
+    const listed = await open(ctx, search.id);
+    expect(listed).toMatchObject({ total: 1, open: 1, setAside: 2 });
+    expect(listed.postings.map((entry) => entry.externalId)).toEqual(["1"]);
+    const aside = await listPostings(
+      ctx,
+      listPostingsSchema.parse({ searchId: search.id, status: "set_aside" }),
+    );
+    expect(
+      Object.fromEntries(aside.postings.map((entry) => [entry.externalId, entry.setAsideReasons])),
+    ).toEqual({ "2": ["not_remote", "region"], "3": ["region"] });
   });
 
   it("keeps going when a board fails and says which", async () => {

@@ -22,17 +22,18 @@ describe("searchSettingsSchema", () => {
     });
   });
 
-  it("takes the agreed first search as valid, with every criterion a preference", () => {
+  it("takes the agreed first search as valid: remote and place required, the rest preferences", () => {
     const parsed = searchSettingsSchema.parse(defaultSearchSettings);
     const { criteria } = parsed;
+    expect(criteria.remote).toEqual({ value: "remote", required: true });
+    expect(criteria.regions).toEqual({
+      values: ["Costa Rica", "Latin America", "Anywhere"],
+      required: true,
+    });
     expect(
-      [
-        criteria.titles,
-        criteria.keywords,
-        criteria.remote,
-        criteria.regions,
-        criteria.salary,
-      ].every((criterion) => criterion.required === false),
+      [criteria.titles, criteria.keywords, criteria.salary].every(
+        (criterion) => criterion.required === false,
+      ),
     ).toBe(true);
     expect(criteria.salary).toMatchObject({ ideal: 60_000, minimum: 50_000 });
   });

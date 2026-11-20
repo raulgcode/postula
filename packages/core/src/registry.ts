@@ -282,7 +282,7 @@ export const verOfertas = defineOperation({
   name: "ver_ofertas",
   title: "List a search's postings",
   description:
-    "The postings a search found, newest first: title, company, place, remote or not, pay when the board says it, and links. `open` (default) leaves out closed postings and duplicates of a job already listed. Use ver_oferta for one posting's full description.",
+    "The postings a search found, newest first: title, company, place, remote or not, pay when the board says it, and links. `open` (default) lists the open ones that meet what the search requires (for example remote and hiring from Costa Rica), without duplicates; `set_aside` lists the open ones that don't, each with `setAsideReasons`; `all` adds closed postings and duplicates. The answer also counts `open` and `setAside`. Use ver_oferta for one posting's full description.",
   input: listPostingsSchema,
   access: "read",
   destructive: false,

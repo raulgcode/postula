@@ -41,7 +41,7 @@ describe("job searches", () => {
       currency: "USD",
       required: false,
     });
-    expect(search.criteria.remote).toEqual({ value: "remote", required: false });
+    expect(search.criteria.remote).toEqual({ value: "remote", required: true });
     expect(search.companies).toHaveLength(suggestedCompanies.length);
     expect(search.companies.every((company) => company.status === "unchecked")).toBe(true);
     const [summary] = await listSearches(ctx);

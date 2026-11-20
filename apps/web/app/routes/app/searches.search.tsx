@@ -52,7 +52,8 @@ export async function loader({ params, context }: Route.LoaderArgs) {
     return {
       search,
       lastRun: runs[0] ?? null,
-      openPostings: open.total,
+      openPostings: open.open,
+      setAsidePostings: open.setAside,
       i18n: translations(context, "searches", "forms"),
     };
   } catch (error) {
@@ -113,7 +114,7 @@ export async function action({ request, params, context }: Route.ActionArgs) {
 export default function SearchPage({ loaderData, actionData }: Route.ComponentProps) {
   const t = useT();
   const navigation = useNavigation();
-  const { search, lastRun, openPostings } = loaderData;
+  const { search, lastRun, openPostings, setAsidePostings } = loaderData;
   const settingsResult = actionData?.intent === "settings" ? actionData.result : undefined;
   const saved = settingsResult?.status === "success" && navigation.state === "idle";
 
@@ -126,6 +127,7 @@ export default function SearchPage({ loaderData, actionData }: Route.ComponentPr
           runAt={search.runAt}
           lastRun={lastRun}
           openPostings={openPostings}
+          setAsidePostings={setAsidePostings}
           busy={actionData?.intent === "run" && "busy" in actionData}
         />
         <SearchForm
@@ -189,12 +191,14 @@ function Postings({
   runAt,
   lastRun,
   openPostings,
+  setAsidePostings,
   busy,
 }: {
   searchId: string;
   runAt: string;
   lastRun: SearchRun | null;
   openPostings: number;
+  setAsidePostings: number;
   busy: boolean;
 }) {
   const t = useT();
@@ -240,6 +244,11 @@ function Postings({
             </p>
           ) : null}
           {!running && lastRun?.status === "failed" ? <p>{t("searches.runFailed")}</p> : null}
+          {!running && setAsidePostings > 0 ? (
+            <p className="text-muted-foreground">
+              {t("searches.setAsideCount", { count: setAsidePostings })}
+            </p>
+          ) : null}
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
           <Form method="post">
@@ -255,11 +264,15 @@ function Postings({
               {t("searches.runNow")}
             </Button>
           </Form>
-          {openPostings > 0 ? (
+          {openPostings + setAsidePostings > 0 ? (
             <Button asChild variant="outline" size="lg">
-              <Link to={href("/app/searches/:searchId/postings", { searchId })}>
+              <Link
+                to={`${href("/app/searches/:searchId/postings", { searchId })}${openPostings ? "" : "?show=set_aside"}`}
+              >
                 <ListIcon aria-hidden />
-                {t("searches.seePostings", { count: openPostings })}
+                {openPostings
+                  ? t("searches.seePostings", { count: openPostings })
+                  : t("searches.showSetAside", { count: setAsidePostings })}
               </Link>
             </Button>
           ) : null}

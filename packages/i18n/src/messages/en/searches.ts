@@ -1,10 +1,10 @@
 export const searches = {
   title: "Your searches",
   intro:
-    "What Postula looks for every day and where. Everything you set is a preference: it adds or takes points, and every posting stays in your list.",
+    "What Postula looks for every day and where. What you set adds or takes points; what you mark as required sets aside the postings that don't meet it, and you can still see them.",
   emptyTitle: "You don't have a search yet",
   emptyIntro:
-    "Start with the usual one: remote, open to Costa Rica and Latin America, US$60,000 a year ideal, in 27 companies that hire remotely. You can change all of it.",
+    "Start with the usual one: only remote jobs that hire from Costa Rica, Latin America or anywhere, US$60,000 a year ideal, in 27 companies that hire remotely. You can change all of it.",
   newAction: "New search",
   newTitle: "New search",
   newIntro: "It starts filled in with the usual values. Change what you want and save.",
@@ -91,6 +91,24 @@ export const searches = {
     "What the companies' boards list today, newest first. The same job on two boards shows once, and closed postings leave the list.",
   postingsEmpty: "No open postings yet. Use “Search now” on the search's page.",
   postingsCount: { one: "{count} open posting", other: "{count} open postings" },
+  setAsideCount: {
+    one: "{count} more set aside for not meeting what you marked as required.",
+    other: "{count} more set aside for not meeting what you marked as required.",
+  },
+  showOpen: "In your list ({count})",
+  showSetAside: "Set aside ({count})",
+  showLabel: "Which postings",
+  setAsideIntro:
+    "Open postings that miss something you marked as required. Change it in the search and they come back.",
+  setAsideEmpty: "Nothing set aside: every open posting meets what you require.",
+  reasonExcludedCompany: "A company you never want",
+  reasonNotRemote: "Not remote",
+  reasonRegion: "Doesn't say it hires from {regions}",
+  reasonTitle: "The title doesn't have your words",
+  reasonKeywords: "Doesn't mention your words",
+  reasonExcludedKeyword: "Mentions a word you don't want",
+  reasonSalary: "Pays less than your lowest",
+  setAsideBecause: "Set aside: {reasons}",
   backToSearch: "Back to the search",
   workplaceRemote: "Remote",
   workplaceHybrid: "Hybrid",

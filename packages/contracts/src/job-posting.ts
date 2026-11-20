@@ -1,6 +1,7 @@
 import { z } from "zod/mini";
 import type { JobBoard } from "./job-search";
 import { message } from "./message";
+import type { SetAsideReason } from "./posting-filter";
 
 /** Where the work happens, as each board says it (or `unknown` when it doesn't). */
 export const workplaces = ["remote", "hybrid", "onsite", "unknown"] as const;
@@ -51,7 +52,10 @@ export interface JobPosting extends BoardPosting {
   duplicateOfId: string | null;
 }
 
-export type JobPostingSummary = Omit<JobPosting, "description">;
+export type JobPostingSummary = Omit<JobPosting, "description"> & {
+  /** Why this search sets it aside (what it marked required); empty when it's in the list. */
+  setAsideReasons: SetAsideReason[];
+};
 
 /** How a run of a search went, company by company. */
 export interface SearchRun {
@@ -78,8 +82,12 @@ export const runSearchSchema = z.object({ id: searchId });
 
 export const listPostingsSchema = z.object({
   searchId,
-  /** `open` (default) hides closed postings and duplicates; `all` shows everything. */
-  status: z._default(z.enum(["open", "all"]), "open"),
+  /**
+   * `open` (default): open postings that meet what the search requires, without duplicates.
+   * `set_aside`: open postings that don't, each with its reasons. `all`: everything, also closed
+   * postings and duplicates.
+   */
+  status: z._default(z.enum(["open", "set_aside", "all"]), "open"),
   limit: z._default(z.number().check(z.int(), z.minimum(1), z.maximum(200)), 50),
   offset: z._default(z.number().check(z.int(), z.minimum(0)), 0),
 });
