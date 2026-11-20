@@ -2,6 +2,7 @@ import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import sensible from "@fastify/sensible";
 import swagger from "@fastify/swagger";
+import { MCP_PATH } from "@postula/contracts";
 import { type CoreServices, DomainError, NotFoundError } from "@postula/core";
 import type { Database } from "@postula/db";
 import Fastify, { type FastifyServerOptions } from "fastify";
@@ -73,6 +74,31 @@ export async function buildApp({
     }
     if (error instanceof DomainError) {
       return reply.code(409).send({ error: error.code, message: error.message });
+    }
+    // A body Fastify couldn't read (bad JSON, wrong type, too big) is the caller's mistake.
+    const {
+      statusCode: status,
+      code: errorCode,
+      message = "Bad request",
+    } = error as {
+      statusCode?: number;
+      code?: string;
+      message?: string;
+    };
+    if (status && status >= 400 && status < 500) {
+      if (request.url.split("?")[0] === MCP_PATH) {
+        // JSON-RPC's own answer, so an AI's client can show what went wrong.
+        const code = errorCode === "FST_ERR_CTP_INVALID_JSON_BODY" ? -32700 : -32600;
+        return reply.code(status).send({
+          jsonrpc: "2.0",
+          error: {
+            code,
+            message: code === -32700 ? "Parse error: the body isn't valid JSON" : message,
+          },
+          id: null,
+        });
+      }
+      return reply.code(status).send({ error: "bad_request", message });
     }
     request.log.error(error);
     return reply.code(500).send({ error: "internal_error" });

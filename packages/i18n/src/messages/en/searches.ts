@@ -4,7 +4,7 @@ export const searches = {
     "What Postula looks for every day and where. What you set adds or takes points; what you mark as required sets aside the postings that don't meet it, and you can still see them.",
   emptyTitle: "You don't have a search yet",
   emptyIntro:
-    "Start with the usual one: only remote jobs that hire from Costa Rica, Latin America or anywhere, US$60,000 a year ideal, in 27 companies that hire remotely. You can change all of it.",
+    "Start with the usual one: only remote jobs that hire from Costa Rica, Latin America or anywhere, US$60,000 a year ideal, in 24 companies that hire remotely. You can change all of it.",
   newAction: "New search",
   newTitle: "New search",
   newIntro: "It starts filled in with the usual values. Change what you want and save.",

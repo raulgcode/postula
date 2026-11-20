@@ -76,7 +76,7 @@ const prepare = (tenant: TenantContext) => ({
 // Each scenario signs in with an account of its own: searches are the person's, and these
 // change them.
 test.describe("Feature: searches", () => {
-  test("Scenario: they create the usual search and it starts with 27 suggested companies", async ({
+  test("Scenario: they create the usual search and it starts with 24 suggested companies", async ({
     page,
     signIn,
     expectAccessible,
@@ -102,7 +102,7 @@ test.describe("Feature: searches", () => {
       ).toBeVisible();
       await expect(
         page.getByRole("list", { name: "Companies it looks in" }).getByRole("listitem"),
-      ).toHaveCount(27);
+      ).toHaveCount(24);
       await expectAccessible(page);
     });
 
@@ -110,7 +110,7 @@ test.describe("Feature: searches", () => {
       await openSection(page, "Searches");
       const search = page.getByRole("link", { name: "Open Remote, well paid" });
       await expect(search).toContainText("Every day at 08:00 (America/Costa_Rica)");
-      await expect(search).toContainText("27 companies");
+      await expect(search).toContainText("24 companies");
     });
   });
 
@@ -193,7 +193,7 @@ test.describe("Feature: searches", () => {
     });
 
     await test.step("Then Ramp is in the list, not checked yet", async () => {
-      await expect(companies.getByRole("listitem")).toHaveCount(28);
+      await expect(companies.getByRole("listitem")).toHaveCount(25);
       await expect(companies.getByRole("listitem").filter({ hasText: "Ramp" })).toContainText(
         "ashby · ramp · Not checked yet",
       );
@@ -204,10 +204,10 @@ test.describe("Feature: searches", () => {
     });
 
     await test.step("Then Binance is gone, even after reloading", async () => {
-      await expect(companies.getByRole("listitem")).toHaveCount(27);
+      await expect(companies.getByRole("listitem")).toHaveCount(24);
       await page.reload();
       await expect(page.getByRole("button", { name: "Take Binance out" })).toHaveCount(0);
-      await expect(companies.getByRole("listitem")).toHaveCount(27);
+      await expect(companies.getByRole("listitem")).toHaveCount(24);
     });
   });
 

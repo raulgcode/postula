@@ -105,6 +105,26 @@ describe("OAuth discovery", () => {
   });
 });
 
+describe("a body that isn't JSON", () => {
+  it("gets JSON-RPC's parse error with a 400, not a server error", async () => {
+    const { token } = await connect();
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/mcp",
+      headers: {
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+        accept: "application/json, text/event-stream",
+      },
+      payload: '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"arguments":{\\}}}',
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toMatchObject({ jsonrpc: "2.0", error: { code: -32700 }, id: null });
+  });
+});
+
 describe("tools", () => {
   it("serves one tool per operation, with its title and hints", async () => {
     const { token } = await connect();

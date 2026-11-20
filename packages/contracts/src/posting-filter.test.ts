@@ -47,6 +47,41 @@ describe("setAsideReasonsOf with the default search", () => {
     expect(setAsideReasonsOf(posting({ location: "Remote" }), criteria)).toEqual(["region"]);
   });
 
+  it("doesn't take an anywhere narrowed to the United States as anywhere", () => {
+    for (const location of [
+      "Anywhere in the United States",
+      "Remote - Anywhere (US, Canada)",
+      "Worldwide (USA only)",
+    ]) {
+      expect(setAsideReasonsOf(posting({ location }), criteria), location).toEqual(["region"]);
+    }
+    expect(setAsideReasonsOf(posting({ location: "Anywhere in Latin America" }), criteria)).toEqual(
+      [],
+    );
+  });
+
+  it("sets aside a job whose title says it only hires in the United States", () => {
+    for (const title of [
+      "General Manager, Sales - US Based",
+      "Client Partner (US-Based)",
+      "Senior Engineer - USA only",
+      "Remote US - Staff Engineer",
+    ]) {
+      expect(setAsideReasonsOf(posting({ title, location: "Anywhere" }), criteria), title).toEqual([
+        "region",
+      ]);
+    }
+  });
+
+  it("keeps a US-only title when the person asked for the United States", () => {
+    const usa = searchCriteriaSchema.parse({
+      regions: { values: ["United States"], required: true },
+    });
+    expect(
+      setAsideReasonsOf(posting({ title: "Engineer - US Based", location: "Remote, USA" }), usa),
+    ).toEqual([]);
+  });
+
   it("sets aside an office job in Costa Rica", () => {
     expect(
       setAsideReasonsOf(

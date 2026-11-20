@@ -7,7 +7,7 @@ export const searches = {
     "Lo que Postula busca cada día y dónde. Lo que pones suma o resta puntos; lo que marcas como obligatorio deja aparte las ofertas que no lo cumplen, y igual puedes verlas.",
   emptyTitle: "Todavía no tienes una búsqueda",
   emptyIntro:
-    "Empieza con la de siempre: solo trabajos remotos que contraten desde Costa Rica, Latinoamérica o cualquier lugar, US$60 000 al año como ideal, en 27 empresas que contratan en remoto. Puedes cambiarlo todo.",
+    "Empieza con la de siempre: solo trabajos remotos que contraten desde Costa Rica, Latinoamérica o cualquier lugar, US$60 000 al año como ideal, en 24 empresas que contratan en remoto. Puedes cambiarlo todo.",
   newAction: "Nueva búsqueda",
   newTitle: "Nueva búsqueda",
   newIntro: "Empieza llena con lo de siempre. Cambia lo que quieras y guarda.",

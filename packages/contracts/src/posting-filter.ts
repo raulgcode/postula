@@ -55,6 +55,19 @@ const regionAliases: Record<string, string[]> = {
   anywhere: ["anywhere", "worldwide", "world wide", "global", "globally", "any location"],
 };
 
+/**
+ * Places a board names to say who it hires, when that isn't everyone: "Anywhere in the United
+ * States" or "Remote (US, Canada)" isn't anywhere for someone in Costa Rica.
+ */
+const limitingPlaces: Record<string, string[]> = {
+  "united states": ["united states", "usa", "us", "u s", "u s a", "north america"],
+  canada: ["canada", "north america"],
+  "united kingdom": ["united kingdom", "uk", "great britain", "england"],
+  europe: ["europe", "eu", "emea"],
+  asia: ["apac", "asia", "india"],
+  australia: ["australia", "new zealand", "anz"],
+};
+
 function aliasesOf(region: string): string[] {
   const key = plain(region).trim();
   if (key === "latam" || key === "latinoamerica" || key === "america latina") {
@@ -63,13 +76,56 @@ function aliasesOf(region: string): string[] {
   if (key === "worldwide" || key === "global" || key === "cualquier lugar") {
     return regionAliases.anywhere ?? [key];
   }
-  return regionAliases[key] ?? [key];
+  const limiting = Object.entries(limitingPlaces).find(
+    ([place, names]) => place === key || names.includes(key),
+  );
+  return regionAliases[key] ?? limiting?.[1] ?? [key];
 }
 
-/** Whether a posting's place names one of the person's regions ("Remote - LATAM" names LATAM). */
+/** The limiting places a text names that the person didn't ask for. */
+function otherPlacesIn(text: string, regions: string[]): string[] {
+  const asked = regions.flatMap(aliasesOf);
+  return Object.entries(limitingPlaces)
+    .filter(([, names]) => names.some((name) => has(text, name) && !asked.includes(name)))
+    .map(([place]) => place);
+}
+
+/**
+ * Whether a posting's place names one of the person's regions ("Remote - LATAM" names LATAM).
+ * "Anywhere" (or worldwide) only counts when it isn't narrowed to another place, as in
+ * "Anywhere in the United States".
+ */
 export function locationMatchesRegions(location: string, regions: string[]): boolean {
   const where = plain(location);
-  return regions.some((region) => aliasesOf(region).some((alias) => has(where, alias)));
+  const narrowed = has(where, "anywhere in") || otherPlacesIn(where, regions).length > 0;
+  return regions.some((region) => {
+    const everywhere =
+      plain(region).trim() === "anywhere" || aliasesOf(region).includes("anywhere");
+    if (everywhere && narrowed) return false;
+    return aliasesOf(region).some((alias) => has(where, alias));
+  });
+}
+
+/**
+ * Whether a title says it only hires in a place the person didn't ask for: "US Based",
+ * "Canada only", "Based in the UK", "Remote US".
+ */
+export function titleLimitsToOtherPlace(title: string, regions: string[]): boolean {
+  const text = plain(title);
+  return Object.entries(limitingPlaces).some(([, names]) =>
+    names.some(
+      (name) =>
+        !regions.flatMap(aliasesOf).includes(name) &&
+        [
+          `${name} based`,
+          `${name} only`,
+          `based in ${name}`,
+          `based in the ${name}`,
+          `remote ${name}`,
+          `${name} remote`,
+        ].some((phrase) => has(text, phrase)),
+    ),
+  );
 }
 
 /**
@@ -94,7 +150,12 @@ export function setAsideReasonsOf(
   }
 
   if (regions.required && regions.values.length > 0) {
-    if (!locationMatchesRegions(posting.location, regions.values)) reasons.push("region");
+    if (
+      !locationMatchesRegions(posting.location, regions.values) ||
+      titleLimitsToOtherPlace(posting.title, regions.values)
+    ) {
+      reasons.push("region");
+    }
   }
 
   const title = plain(posting.title);
